@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">CafiteriaProject5</string>
+
+    <string-array name="grade">
+        <item>ז</item>
+        <item>ח</item>
+        <item>ט</item>
+        <item>י</item>
+        <item>יא</item>
+        <item>יב</item>
+    </string-array>
+</resources>
