@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_schedule"
+            android:icon="@drawable/ic_baseline_schedule_24"
+            android:title="לוח משמרות"/>
+        <item
+            android:id="@+id/nav_shopping_edit"
+            android:icon="@drawable/ic_baseline_edit_24"
+            android:title="עריכת דף הבית של הלקוח"/>
+        <item
+            android:id="@+id/nav_do_not_disturb"
+            android:icon="@drawable/ic_baseline_do_not_disturb_24"
+            android:title="מסך מנהל"/>
+        <item
+            android:id="@+id/nav_person"
+            android:icon="@drawable/ic_baseline_person_24"
+            android:title="פרופיל"/>
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_baseline_logout_24"
+            android:title="יציאה מהחשבון"/>
+    </group>
+
+</menu>
