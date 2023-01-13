@@ -59,6 +59,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(currentUser != null){
             String gmailForStart = currentUser.getEmail().toString();
             DocumentReference docRef = firestore.collection("users").document(gmailForStart);
+            Intent iClient = new Intent(MainActivity.this, ClientMainActivity.class);
+            Intent iAdmin = new Intent(MainActivity.this, AdminMainActivity.class);
+            iClient.putExtra("doc", gmailForStart.toString());
+            iAdmin.putExtra("doc", gmailForStart.toString());
             docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -67,12 +71,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (document.exists()) {
                             String typeLog = document.getString("type");
                             if(typeLog.equals("client")){
-                                startActivity(new Intent(MainActivity.this, ClientMainActivity.class));
+                                startActivity(iClient);
                             }
                             else{
-                                startActivity(new Intent(MainActivity.this, AdminMainActivity.class));
+                                startActivity(iAdmin);
                             }
                         }
+                    }
+                    else{
+                        Toast.makeText(MainActivity.this, "task failed", Toast.LENGTH_SHORT);
                     }
                 }
             });

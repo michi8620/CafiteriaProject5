@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tvUserGmail"
+        android:layout_width="170dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingLeft="10dp"
+        android:text="אימייל"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="שם"
+        android:paddingRight="5dp"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvUserLastname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="שם משפחה"
+        android:paddingRight="5dp"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvUserGrade"
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingRight="5dp"
+        android:text="שכבה"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvUserMoney"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="כסף בקופה"
+        android:paddingRight="5dp"
+        android:textSize="16sp" />
+
+</LinearLayout>

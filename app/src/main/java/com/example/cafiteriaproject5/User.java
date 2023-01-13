@@ -7,6 +7,8 @@ public class User {
     private String grade;
     private String password;
     private String type;
+    private double money;
+
 
     public User(String firstName, String lastName, String gmail, String grade, String password, String type) {
         this.firstName = firstName;
@@ -15,6 +17,15 @@ public class User {
         this.grade = grade;
         this.password = password;
         this.type = type;
+        this.money = 0;
+    }
+
+    public User(String firstName, String lastName, String gmail, String grade, Double money) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gmail = gmail;
+        this.grade = grade;
+        this.money = money;
     }
 
     public User() {
@@ -63,4 +74,8 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public double getMoney() {return money;}
+
+    public void setMoney(double money) {this.money = money;}
 }

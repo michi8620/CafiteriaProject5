@@ -7,6 +7,13 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,6 +30,14 @@ public class ShoppingFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private FirebaseFirestore firestore;
+    private Button btnDeliveryDialog, btnSendDelivery;
+    private EditText etCodeDelivery, etQuantity;
+    private ListView deliveryListView;
+    private ProductAdapter adapter;
+
+    private ArrayList<Product> deliveryArrayList = new ArrayList<Product>();
 
     public ShoppingFragment() {
         // Required empty public constructor
@@ -59,6 +74,10 @@ public class ShoppingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_shopping, container, false);
+        View view = inflater.inflate(R.layout.fragment_shopping, container, false);
+
+        btnDeliveryDialog = view.findViewById(R.id.btnDeliveryDialog);
+        btnSendDelivery = view.findViewById(R.id.btnSendDelivery);
+        return view;
     }
 }

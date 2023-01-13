@@ -125,7 +125,7 @@
         <ListView
             android:id="@+id/listViewProductClient"
             android:layout_width="409dp"
-            android:layout_height="337dp"
+            android:layout_height="357dp"
             android:layout_marginTop="60dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"

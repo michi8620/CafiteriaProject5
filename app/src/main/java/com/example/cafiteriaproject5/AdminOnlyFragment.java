@@ -1,12 +1,33 @@
 package com.example.cafiteriaproject5;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,6 +44,15 @@ public class AdminOnlyFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private Button btnSelectImage, btnUploadImage;
+    private ImageView imageSchedule;
+    Uri imageUri;
+    Context thiscontext;
+    StorageReference storageRef;
+    ProgressDialog progressDialog;
+
+
 
     public AdminOnlyFragment() {
         // Required empty public constructor
@@ -59,6 +89,92 @@ public class AdminOnlyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_admin_only, container, false);
+        View view = inflater.inflate(R.layout.fragment_admin_only, container, false);
+
+        btnSelectImage = view.findViewById(R.id.btnSelectImage);
+        btnUploadImage = view.findViewById(R.id.btnUploadImage);
+        imageSchedule = view.findViewById(R.id.imageSchedule);
+        thiscontext = container.getContext();
+
+        btnSelectImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectImage();
+            }
+        });
+
+        btnUploadImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                uploadImage();
+
+            }
+        });
+        return view;
+    }
+
+    private void uploadImage() {
+
+        //מסך טעינה להעלאת קובץ
+        progressDialog = new ProgressDialog(thiscontext);
+        progressDialog.setTitle("Uploading file....");
+        progressDialog.show();
+
+        storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference scheduleRef = storageRef.child("images/schedule.jpg");
+        // Delete the file that already exists to prevent loss of storage
+        //there's always a picture already existing.
+        scheduleRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(thiscontext, "file deleted successfully", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(thiscontext, exception.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        //upload image
+        scheduleRef.putFile(imageUri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                        imageSchedule.setImageURI(null);
+                        Toast.makeText(thiscontext, "Successfully uploaded", Toast.LENGTH_SHORT).show();
+                        if(progressDialog.isShowing())
+                            progressDialog.dismiss();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        if(progressDialog.isShowing())
+                            progressDialog.dismiss();
+                        Toast.makeText(thiscontext, e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+    }
+
+    private void selectImage() {
+        Intent intent = new Intent();
+        intent.setType("image/");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, 100);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == 100 && data != null && data.getData() != null){
+
+            imageUri = data.getData();
+            imageSchedule.setImageURI(imageUri);
+
+        }
     }
 }

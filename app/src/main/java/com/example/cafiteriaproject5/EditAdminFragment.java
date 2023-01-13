@@ -2,12 +2,14 @@ package com.example.cafiteriaproject5;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -54,12 +56,12 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
     private FirebaseFirestore firestore;
     private Button btnAddEventDialog, btnAddProductDialog;
     private TextView tvTitle, tvText;
-    public int productCode = 99;
+    private static int productCode = 99;
 
     private ListView productListView;
     private ProductAdapter adapter;
 
-    private ArrayList<Product> productArrayList = new ArrayList<Product>();;
+    private ArrayList<Product> productArrayList = new ArrayList<Product>();
 
     public EditAdminFragment() {
         // Required empty public constructor
@@ -120,6 +122,12 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         thiscontext = container.getContext();
+        //productCode is set to be 99 everytime the app runs.
+        //to prevent that we save productCode to sharedPreferences
+        //which is like file in the application. 
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(thiscontext);
+        productCode = sp.getInt("product_code", 0);
+
         View view= inflater.inflate(R.layout.fragment_edit_admin, container, false);
         tvText = view.findViewById(R.id.tvText);
         tvTitle = view.findViewById(R.id.tvTitle);
@@ -270,6 +278,10 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
                             });
                 }
             });
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(thiscontext);
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt("product_code", productCode);
+            editor.apply();  /* Edit the value here*/
         }
     }
 

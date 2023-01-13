@@ -51,7 +51,7 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
     private ListView productListViewClient;
     private ProductAdapter adapter;
 
-    private ArrayList<Product> productArrayListClient = new ArrayList<Product>();;
+    private ArrayList<Product> productArrayListClient = new ArrayList<Product>();
 
     public HomeFragment() {
         // Required empty public constructor
