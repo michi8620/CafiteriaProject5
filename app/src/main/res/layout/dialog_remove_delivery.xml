@@ -6,42 +6,26 @@
     android:layout_height="match_parent">
 
     <EditText
-        android:id="@+id/etCodeDelivery"
+        android:id="@+id/etIndex"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="28dp"
         android:ems="10"
-        android:hint="קוד מוצר"
+        android:hint="מספר המוצר"
         android:inputType="number"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/etQuantityDelivery"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="כמות"
-        android:inputType="number"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etCodeDelivery" />
-
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnRemoveDelivery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="הוספה"
-        android:textSize="20sp"
+        android:layout_marginTop="12dp"
+        android:text="הסר מוצר מהמשלוח"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etQuantityDelivery" />
-
+        app:layout_constraintTop_toBottomOf="@+id/etIndex" />
 </androidx.constraintlayout.widget.ConstraintLayout>

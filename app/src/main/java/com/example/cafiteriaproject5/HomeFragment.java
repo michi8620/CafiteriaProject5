@@ -1,5 +1,6 @@
 package com.example.cafiteriaproject5;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -34,14 +35,12 @@ import java.util.List;
  */
 public class HomeFragment extends Fragment implements EventListener<QuerySnapshot> {
 
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
     Context thiscontext;
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -65,7 +64,6 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
      * @param param2 Parameter 2.
      * @return A new instance of fragment HomeFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
@@ -106,6 +104,7 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
         firestore = FirebaseFirestore.getInstance();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

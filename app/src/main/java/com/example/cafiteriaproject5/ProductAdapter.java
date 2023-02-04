@@ -1,5 +1,6 @@
 package com.example.cafiteriaproject5;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +27,7 @@ public class ProductAdapter extends ArrayAdapter<Product>{
     @NonNull
     @Override
     public View getView(int position, @NonNull View convertView, @NonNull ViewGroup parent){
-        View view = LayoutInflater.from(context).inflate(R.layout.product_row, null, false);
+        @SuppressLint("ViewHolder") View view = LayoutInflater.from(context).inflate(R.layout.product_row, null, false);
         Product product = productArrayList.get(position);
         view.setLayoutDirection(getContext().getResources().getConfiguration().getLayoutDirection());
 

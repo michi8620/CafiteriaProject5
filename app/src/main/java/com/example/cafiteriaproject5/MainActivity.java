@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //do nothing
     }
 
-    //TODO: בדיקת נתונים ויצירת מנהל
+    //TODO: בדיקת נתונים
     @Override
     public void onClick(View v) {
         if(v == btnRegDialog){
@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.setView(dialogView);
             //Creates an AlertDialog with the arguments supplied to this builder.
             builder.create().show();
+
             Button btnRegister = dialogView.findViewById(R.id.btnRegister);
             EditText etFirstName, etLastName, etRegPassword, etGmailReg;
             etFirstName = dialogView.findViewById(R.id.etFirstName);

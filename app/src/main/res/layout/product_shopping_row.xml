@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/tvIndex"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingRight="5dp"
+        android:text="מספר" />
+
+    <TextView
+        android:id="@+id/tvProductNameShopping"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingRight="5dp"
+        android:text="שם" />
+
+    <TextView
+        android:id="@+id/tvProductQuantityShopping"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingRight="5dp"
+        android:text="כמות" />
+
+    <TextView
+        android:id="@+id/tvProductTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingRight="5dp"
+        android:text="סהכ" />
+
+</LinearLayout>
