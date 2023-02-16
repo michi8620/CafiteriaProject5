@@ -3,23 +3,22 @@ package com.example.cafiteriaproject5;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
-import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -51,12 +50,14 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
 
     private String mParam1;
     private String mParam2;
+    private String TAG = "EditAdminFragment";
 
     private FirebaseFirestore firestore;
     private Button btnAddEventDialog, btnAddProductDialog;
     private TextView tvTitle, tvText;
     private static int productCode = 99;
 
+    //I need to go to zipi more. there's better ways.
     private ListView productListView;
     private ProductAdapter adapter;
 
@@ -121,11 +122,6 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         thiscontext = container.getContext();
-        //productCode is set to be 99 everytime the app runs.
-        //to prevent that we save productCode to sharedPreferences
-        //which is like file in the application. 
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(thiscontext);
-        productCode = sp.getInt("product_code", 0);
 
         View view= inflater.inflate(R.layout.fragment_edit_admin, container, false);
         tvText = view.findViewById(R.id.tvText);
@@ -185,6 +181,28 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
                     }
                 });
 
+        //delete a product if the user presses long on it.
+        productListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                //deletes a document
+                String productCode = productArrayList.get(position).getCode() + "";
+                firestore.collection("products").document(productCode)
+                        .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d("EditAdminFragment", "onSuccess: deleted document successfully");
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w("EditAdminFragment", "onFailure: Error deleting document", e);
+                            }
+                        });
+                adapter.notifyDataSetChanged();
+                return false;
+            }
+        });
         return view;
     }
 
@@ -211,6 +229,7 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
                     String title = etTitle.getText().toString();
                     String text = etText.getText().toString();
 
+                    //change the event
                     if(title.isEmpty() || text.isEmpty()){
                         Toast.makeText(dialogView.getContext(), "אנא כתוב גם כותרת וגם טקסט לאירוע", Toast.LENGTH_LONG);
                     }
@@ -256,7 +275,13 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
                 public void onClick(View view) {
                     String productName = etProductName.getText().toString();
                     Double price = Double.parseDouble(etPrice.getText().toString());
-                    productCode++;
+                    int highestCode = 99;
+                    for(Product product : productArrayList){
+                        if(product.getCode() > highestCode) {
+                            highestCode = product.getCode();
+                        }
+                    }
+                    productCode = highestCode+1;
                     Product product = new Product(productName, price, productCode);
                     String code = Integer.toString(productCode);
                     firestore.collection("products")
@@ -266,9 +291,8 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if(task.isSuccessful()){
-                                        Toast.makeText(dialogView.getContext(), "product was added", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(dialogView.getContext(), "הוספת מוצר בהצלחה", Toast.LENGTH_SHORT).show();
                                         alert.dismiss();
-
                                     }
                                     else{
                                         Toast.makeText(dialogView.getContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
@@ -277,10 +301,6 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
                             });
                 }
             });
-            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(thiscontext);
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putInt("product_code", productCode);
-            editor.apply();  /* Edit the value here*/
         }
     }
 

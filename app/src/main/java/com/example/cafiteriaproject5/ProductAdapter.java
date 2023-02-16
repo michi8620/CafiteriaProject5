@@ -11,7 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class ProductAdapter extends ArrayAdapter<Product>{
@@ -32,12 +31,12 @@ public class ProductAdapter extends ArrayAdapter<Product>{
         view.setLayoutDirection(getContext().getResources().getConfiguration().getLayoutDirection());
 
         TextView tvProductName = view.findViewById(R.id.tvProductName);
-        TextView tvProductPrice = view.findViewById(R.id.tvProductPrice);
         TextView tvProductCode = view.findViewById(R.id.tvProductCode);
+        TextView tvProductPrice = view.findViewById(R.id.tvProductPrice);
 
         tvProductName.setText(product.getName() + "");
-        tvProductPrice.setText(product.getPrice() + "₪");
         tvProductCode.setText(product.getCode() + "");
+        tvProductPrice.setText(product.getPrice() + "₪");
 
         return view;
     }

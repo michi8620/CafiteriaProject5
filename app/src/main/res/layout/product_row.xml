@@ -14,6 +14,14 @@
         android:text="קוד" />
 
     <TextView
+        android:id="@+id/tvProductName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingRight="5dp"
+        android:text="שם" />
+
+    <TextView
         android:id="@+id/tvProductPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,11 +29,4 @@
         android:paddingRight="5dp"
         android:text="מחיר" />
 
-    <TextView
-        android:id="@+id/tvProductName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:paddingRight="5dp"
-        android:text="שם" />
 </LinearLayout>

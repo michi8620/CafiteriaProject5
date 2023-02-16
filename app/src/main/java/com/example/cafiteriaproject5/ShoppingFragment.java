@@ -7,12 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +16,11 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -58,12 +57,12 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
     private double sum=0;
     private static int index=0;
 
-    private ArrayList<ProductDelivery> deliveryArrayList = new ArrayList<ProductDelivery>();
+    private ArrayList<ProductDelivery> deliveryArrayList = new ArrayList<>();
 
     private ListView productDialogListView;
     private ProductAdapter adapter2;
 
-    private ArrayList<Product> productDialogArrayList = new ArrayList<Product>();
+    private ArrayList<Product> productDialogArrayList = new ArrayList<>();
 
     public ShoppingFragment() {
         // Required empty public constructor
@@ -172,9 +171,11 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
                 public void onClick(View view) {
                     String codeDelivery = etCodeDelivery.getText().toString();
                     String stringQuantityDelivery = etQuantityDelivery.getText().toString();
+                    //check if the user wrote something in the fields.
                     if(codeDelivery.isEmpty() || stringQuantityDelivery.isEmpty()){
                         Toast.makeText(thisContext, "אנא מלא את כל השדות", Toast.LENGTH_SHORT).show();
                     }
+                    //if yes:
                     if(!codeDelivery.isEmpty() && !stringQuantityDelivery.isEmpty()){
                         int quantityDelivery = Integer.parseInt(stringQuantityDelivery);
                         if(quantityDelivery > 10){
@@ -307,7 +308,7 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
                                             String emailReceiver = "shministboyarreciever@gmail.com";
                                             String subject = "משלוח חדש!";
                                             message = "מבקש המשלוח: " + fullName + "\n שכבה: " + grade + "\n חדר: " + roomNum + "\n";
-                                            message += comment + "\n";
+                                            message += comment + "\n" + "רשימת המוצרים:" + "\n";
                                             //makes the list to string
                                             if(deliveryArrayList != null){
                                                 String listString = deliveryArrayList.stream().map(Object::toString)
@@ -317,6 +318,7 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
                                                 //מבקש המשלוח: [שם ושם משפחה]
                                                 //שכבה: [שכבה]
                                                 //חדר: [חדר]
+                                                //הערות: [הערות]
                                                 //רשימת המוצרים:
                                                 //1. 2 ביסלי
                                                 // 2. 1 תפוצ'יפס
@@ -365,6 +367,7 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
         //\כאן אנחנו יכולים לראות אם יש שינוי כלשהו ברשימה
         List<DocumentSnapshot> productDocList = value.getDocuments();
         //הווליו נותן את כל המסמכים שיש בדוקיומנט.
+        //אנחנו מוחקים את כל הפריטים ברשימה על מנת לעדכן אותה אם הפריטים שונו או שנוספו חדשים.
         productDialogArrayList.clear();
 
         for(DocumentSnapshot doc : productDocList){
@@ -379,6 +382,14 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
         adapter.notifyDataSetChanged();
     }
 
+    /*
+    * this delivery function deletes a product from
+    * the deliveryList by the given index of it.
+    * Also, the productDelivery class have an index attribute, which the
+    * function changes so the index attribute will be accurate to its index position.
+    *
+    * @param deliveryList - the list of products in the delivery, indexToDelete
+     */
     private static void deleteDelivery(List<ProductDelivery> deliveryList, int indexToDelete) {
         deliveryList.remove(indexToDelete);
         for (int i = 0; i < deliveryList.size(); i++) {
@@ -386,6 +397,13 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
+    /*
+    * this findProduct function finds a product in a given list of products
+    * by its name.
+    *
+    * @param deliveryList - the product list, name - the name of the product
+    * @return if found it, return the index, if not return -1. (an int)
+     */
     private static int findProduct(List<ProductDelivery> deliveryList, String name) {
         for (int i = 0; i < deliveryList.size(); i++) {
             if (deliveryList.get(i).getName().equals(name)) {

@@ -1,5 +1,12 @@
 package com.example.cafiteriaproject5;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
@@ -7,12 +14,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -31,7 +32,6 @@ public class AdminMainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     String userType = " ";
 
-    //TODO: לבדוק אם המשתמש כבר מחובר
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,10 +83,10 @@ public class AdminMainActivity extends AppCompatActivity {
                                     if (document.exists()) {
                                         userType = document.getString("type");
                                     } else {
-                                        Toast.makeText(AdminMainActivity.this, "document does not exist", Toast.LENGTH_SHORT).show();
+                                        Log.d("AdminMainActivity", "onComplete: document does not exist");
                                     }
                                 } else {
-                                    Toast.makeText(AdminMainActivity.this, "task failed", Toast.LENGTH_SHORT).show();
+                                    Log.d("AdminMainActivity", "onComplete: task failed");
                                 }
                             }
                         });

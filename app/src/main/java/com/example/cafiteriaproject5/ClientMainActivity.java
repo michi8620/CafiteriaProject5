@@ -64,7 +64,7 @@ public class ClientMainActivity extends AppCompatActivity {
                         break;
 
                     case R.id.nav_add:
-                        replaceFragment(new AddFragment());
+                        replaceFragment(new WantedProductsFragment());
                         break;
 
                     case R.id.nav_person:

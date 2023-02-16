@@ -1,11 +1,8 @@
 package com.example.cafiteriaproject5;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -13,6 +10,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -23,6 +24,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     // declare variables.
@@ -95,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //do nothing
     }
 
-    //TODO: בדיקת נתונים
     @Override
     public void onClick(View v) {
         if(v == btnRegDialog){
@@ -131,9 +133,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     regGmail = etGmailReg.getText().toString();
                     regPassword = etRegPassword.getText().toString();
 
-                    //check if the user fill all the fields.
+                    //check if the user filled all the fields.
                     if(firstName.isEmpty() || lastName.isEmpty() || regPassword.isEmpty() || regGmail.isEmpty() || grade.isEmpty()){
                         Toast.makeText(dialogView.getContext(), "אנא מלא את כל השדות", Toast.LENGTH_SHORT).show();
+                    }
+                    else if(!checkPasswordIfNum(regPassword)){
+                        Toast.makeText(MainActivity.this, "סיסמא חייבת להכיל ספרה אחת לפחות", Toast.LENGTH_LONG).show();
                     }
                     else{
                         //creating the user with type = "client"
@@ -151,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                         @Override
                                                         public void onComplete(@NonNull Task<Void> task) {
                                                             if(task.isSuccessful()){
-                                                                Toast.makeText(dialogView.getContext(), "user was added", Toast.LENGTH_SHORT).show();
+                                                                Toast.makeText(dialogView.getContext(), "נרשמת בהצלחה", Toast.LENGTH_SHORT).show();
                                                                 //intent automatically to clientMain because when signin up the user is automatically a client, unless changed in the firestore by hand.
                                                                 Intent i = new Intent(MainActivity.this, ClientMainActivity.class);
                                                                 i.putExtra("doc", regGmail.toString());
@@ -165,7 +170,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         }
                                         else{
                                             FirebaseAuthException e = (FirebaseAuthException) task.getException();
-                                            Toast.makeText(MainActivity.this, "Authentication failed" + e.getMessage(), Toast.LENGTH_LONG).show();
+                                            Log.d("MainActivity", e.getMessage()+"");
+                                            //it doesn't check if there's numbers!!!
+                                            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 });
@@ -195,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     logGmail = etGmailLog.getText().toString();
                     logPassword = etPasslog.getText().toString();
 
-                    if(logGmail.isEmpty() || logPassword.isEmpty()){
+                    if(logGmail.equals("") || logPassword.equals("")){
                         Toast.makeText(dialogView.getContext(), "אנא מלא את כל השדות", Toast.LENGTH_SHORT).show();
                     }
                     else{
@@ -227,14 +234,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                         }
                                                     }
                                                     else{
-                                                        Toast.makeText(dialogView.getContext(), "task failed", Toast.LENGTH_SHORT);
+                                                        Toast.makeText(dialogView.getContext(), "task failed", Toast.LENGTH_SHORT).show();
                                                     }
                                                 }
                                             });
 
                                         } else {
                                             // If sign in fails, display a message to the user.
-                                            Toast.makeText(dialogView.getContext(), "ההתחברות נכשלה",
+                                            Toast.makeText(dialogView.getContext(), "אימייל או סיסמא אינם נכונים",
                                                     Toast.LENGTH_SHORT).show();
                                         }
                                     }
@@ -257,5 +264,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onNothingSelected(AdapterView<?> parent) {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_register, null, false);
         Toast.makeText(dialogView.getContext(), "אנא מלא את כל השדות", Toast.LENGTH_SHORT).show();
+    }
+
+    /*
+    * this password function checks if a given password
+    * has at least one number in it.
+    *
+    * @param password (String)
+    * @return true or false (boolean)
+     */
+    public boolean checkPasswordIfNum(String password){
+        boolean num=false;
+        for (int i=0; i<password.length(); i++){
+            char ch = password.charAt(i);
+            if(Character.isDigit(ch))
+                num = true;
+        }
+        if(num){
+            return true;
+        }
+        return false;
     }
 }
