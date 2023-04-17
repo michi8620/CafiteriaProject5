@@ -24,7 +24,14 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class AdminMainActivity extends AppCompatActivity {
+/*
+side: shminist
+action: a core for all the fragments in the shminist side.
+contains checking if the shminist is admin while entering "do_not_disturb"
+and the replaceFragment function.
+xml file: activity_admin_main
+ */
+public class ShministMainActivity extends AppCompatActivity {
     MaterialToolbar toolbar;
     DrawerLayout drawerLayout;
     NavigationView navigationView;
@@ -36,12 +43,12 @@ public class AdminMainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_main);
+        setContentView(R.layout.activity_shminist_main);
 
         firestore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        replaceFragment(new HomeAdminFragment());
+        replaceFragment(new HomeShministFragment());
 
         toolbar = findViewById(R.id.topAppbar);
         drawerLayout = findViewById(R.id.drawer_layout_admin);
@@ -64,11 +71,15 @@ public class AdminMainActivity extends AppCompatActivity {
                 switch (id)
                 {
                     case R.id.nav_schedule:
-                        replaceFragment(new HomeAdminFragment());
+                        replaceFragment(new HomeShministFragment());
                         break;
 
                     case R.id.nav_shopping_edit:
-                        replaceFragment(new EditAdminFragment());
+                        replaceFragment(new EditShministFragment());
+                        break;
+
+                    case R.id.nav_emoji_people:
+                        replaceFragment(new SeeWantedFragment());
                         break;
 
                     case R.id.nav_do_not_disturb:
@@ -95,16 +106,16 @@ public class AdminMainActivity extends AppCompatActivity {
                             replaceFragment(new AdminOnlyFragment());
                         }
                         else{
-                            Toast.makeText(AdminMainActivity.this, "זהו מסך למנהלים", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ShministMainActivity.this, "זהו מסך למנהלים", Toast.LENGTH_SHORT).show();
                         }
                         break;
 
                     case R.id.nav_person:
-                        replaceFragment(new ProfileAdminFragment());
+                        replaceFragment(new ProfileShministFragment());
                         break;
                     case R.id.nav_logout:
                         FirebaseAuth.getInstance().signOut();
-                        startActivity(new Intent(AdminMainActivity.this, MainActivity.class));
+                        startActivity(new Intent(ShministMainActivity.this, MainActivity.class));
 
                     default:
                         return true;

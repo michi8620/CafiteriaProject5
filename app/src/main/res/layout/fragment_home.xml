@@ -13,7 +13,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".EditAdminFragment">
+        tools:context=".EditShministFragment">
 
 
         <TextView
@@ -93,7 +93,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="דף הבית"
+            android:text="@string/fragment_home_title"
             android:textColor="#9C27B0"
             android:textSize="34sp"
             app:layout_constraintEnd_toEndOf="parent"

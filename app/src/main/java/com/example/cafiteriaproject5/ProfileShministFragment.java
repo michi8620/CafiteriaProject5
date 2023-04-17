@@ -10,10 +10,10 @@ import android.view.ViewGroup;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ProfileAdminFragment#newInstance} factory method to
+ * Use the {@link ProfileShministFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ProfileAdminFragment extends Fragment {
+public class ProfileShministFragment extends Fragment {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -22,7 +22,7 @@ public class ProfileAdminFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public ProfileAdminFragment() {
+    public ProfileShministFragment() {
         // Required empty public constructor
     }
 
@@ -34,8 +34,8 @@ public class ProfileAdminFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment ProfileAdminFragment.
      */
-    public static ProfileAdminFragment newInstance(String param1, String param2) {
-        ProfileAdminFragment fragment = new ProfileAdminFragment();
+    public static ProfileShministFragment newInstance(String param1, String param2) {
+        ProfileShministFragment fragment = new ProfileShministFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -56,6 +56,6 @@ public class ProfileAdminFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile_admin, container, false);
+        return inflater.inflate(R.layout.fragment_profile_shminist, container, false);
     }
 }

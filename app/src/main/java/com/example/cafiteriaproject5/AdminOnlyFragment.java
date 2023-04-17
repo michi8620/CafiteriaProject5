@@ -3,14 +3,8 @@ package com.example.cafiteriaproject5;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,21 +12,20 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AdminOnlyFragment#newInstance} factory method to
- * create an instance of this fragment.
+/*
+side: Admin
+action: adds the schedule picture from the gallery to HomeAdminFragment
+xml file: fragment_admin_only.xml
  */
 public class AdminOnlyFragment extends Fragment {
 
@@ -103,8 +96,12 @@ public class AdminOnlyFragment extends Fragment {
         btnUploadImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                uploadImage();
+                if(imageUri!=null){
+                    uploadImage();
+                }
+                else{
+                    Toast.makeText(getContext(), "יש לבחור תמונה", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CafiteriaProject5</string>
+    <string name="app_name">Cafiteria</string>
 
     <string-array name="grade">
         <item>ז</item>
@@ -8,6 +8,6 @@
         <item>י</item>
         <item>יא</item>
     </string-array>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fragment_home_title">דף הבית</string>
+    <string name="instagram_hyperlink"><a href="https://instagram.com/reem.shministim?igshid=YmMyMTA2M2Y=">reem.shministim</a></string>
 </resources>

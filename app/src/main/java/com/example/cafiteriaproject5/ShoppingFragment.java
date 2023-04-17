@@ -37,6 +37,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/*
+side: client
+action: the delivery fragment. contains "add product" and "delete product" buttons,
+רשימה של המוצרים שנכנסו למשלוח וכפתור שליחה לאימייל השכבתי.
+the add dialog contains also the product list so the user can see the codes.
+מחיקת מוצר נעשת על ידי כתיבת המספר שלו שנמצא ברשימה של המוצרים שנמצאים במשלוח עד כה.
+xml file: fragment_shopping.xml
+ */
 public class ShoppingFragment extends Fragment implements View.OnClickListener, EventListener<QuerySnapshot> {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

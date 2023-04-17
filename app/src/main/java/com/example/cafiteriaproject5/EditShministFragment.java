@@ -37,10 +37,18 @@ import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link EditAdminFragment#newInstance} factory method to
+ * Use the {@link EditShministFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class EditAdminFragment extends Fragment implements View.OnClickListener, EventListener<QuerySnapshot> {
+
+/*
+side: shminist
+action: change the clients main screen: change event, add product, change price to product and delete product
+xml file: fragment_edit_shminist.xml
+special features: meaningful id, arrayList, scroll in list inside scrolling screen, when
+adding a new product change the meaningful id to be accurate.
+ */
+public class EditShministFragment extends Fragment implements View.OnClickListener, EventListener<QuerySnapshot> {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -53,7 +61,7 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
     private String TAG = "EditAdminFragment";
 
     private FirebaseFirestore firestore;
-    private Button btnAddEventDialog, btnAddProductDialog;
+    private Button btnAddEventDialog, btnAddProductDialog, btnChangePriceDialog;
     private TextView tvTitle, tvText;
     private static int productCode = 99;
 
@@ -63,7 +71,7 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
 
     private ArrayList<Product> productArrayList = new ArrayList<Product>();
 
-    public EditAdminFragment() {
+    public EditShministFragment() {
         // Required empty public constructor
     }
 
@@ -75,8 +83,8 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
      * @param param2 Parameter 2.
      * @return A new instance of fragment EditAdminFragment.
      */
-    public static EditAdminFragment newInstance(String param1, String param2) {
-        EditAdminFragment fragment = new EditAdminFragment();
+    public static EditShministFragment newInstance(String param1, String param2) {
+        EditShministFragment fragment = new EditShministFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -98,7 +106,7 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
                         tvText.setText(document.getString("text"));
                     }
                 } else {
-                    Toast.makeText(thiscontext, "get failed with " + task.getException(), Toast.LENGTH_LONG);
+                    Toast.makeText(thiscontext, "get failed with " + task.getException(), Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -121,15 +129,18 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        assert container != null;
         thiscontext = container.getContext();
 
-        View view= inflater.inflate(R.layout.fragment_edit_admin, container, false);
+        View view= inflater.inflate(R.layout.fragment_edit_shminist, container, false);
         tvText = view.findViewById(R.id.tvText);
         tvTitle = view.findViewById(R.id.tvTitle);
         btnAddEventDialog = view.findViewById(R.id.btnAddEventDialog);
         btnAddProductDialog = view.findViewById(R.id.btnAddProductDialog);
+        btnChangePriceDialog = view.findViewById(R.id.btnChangePriceDialog);
         btnAddEventDialog.setOnClickListener(this);
         btnAddProductDialog.setOnClickListener(this);
+        btnChangePriceDialog.setOnClickListener(this);
 
         productListView = view.findViewById(R.id.listViewProduct);
         //הפונקציה הזו גורמת לכך שהרשימה יורדת גם בתוך מסך שיורד
@@ -241,7 +252,7 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
                                 .set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
-                                        Toast.makeText(thiscontext,"הוספת אירוע בהצלחה", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(thiscontext,"שינית אירוע בהצלחה", Toast.LENGTH_SHORT).show();
                                         alert.dismiss();
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
@@ -295,10 +306,54 @@ public class EditAdminFragment extends Fragment implements View.OnClickListener,
                                         alert.dismiss();
                                     }
                                     else{
-                                        Toast.makeText(dialogView.getContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                        Log.w(TAG, "onCompleteFailure: " + task.getException().toString());
                                     }
                                 }
                             });
+                }
+            });
+        }
+        if(view == btnChangePriceDialog){
+            //הבונה של הדיאלוג
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+            // יצירת הוויאו של הדיאלוג על ידי קריאת קובץ האקסמל
+            View dialogView = getLayoutInflater().inflate(R.layout.dialog_change_price, null, false);
+            //Sets a custom view to be the contents of the alert dialog.
+            builder.setView(dialogView);
+            //Creates an AlertDialog with the arguments supplied to this builder.
+            AlertDialog alert = builder.create();
+            alert.show();
+
+            EditText etProductCodePriceChange, etNewPrice;
+            Button btnChangePrice;
+
+            etProductCodePriceChange = dialogView.findViewById(R.id.etProductCodePriceChange);
+            etNewPrice = dialogView.findViewById(R.id.etNewPrice);
+            btnChangePrice = dialogView.findViewById(R.id.btnChangePrice);
+            btnChangePrice.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String productCodePriceChange = etProductCodePriceChange.getText().toString();
+                    double newPrice = Double.parseDouble(etNewPrice.getText().toString());
+                    if(newPrice <= 0){
+                        Toast.makeText(thiscontext, "מחיר לא תקין", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        firestore.collection("products").document(productCodePriceChange)
+                                .update("price", newPrice).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        adapter.notifyDataSetChanged();
+                                        Toast.makeText(thiscontext, "שינית את המחיר בהצלחה", Toast.LENGTH_SHORT).show();
+                                        alert.dismiss();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(thiscontext, "מוצר לא קיים או בעיה בשינוי המחיר", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
                 }
             });
         }

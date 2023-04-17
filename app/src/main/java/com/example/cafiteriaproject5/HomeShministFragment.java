@@ -5,12 +5,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,8 +13,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 
 import com.ablanco.zoomy.TapListener;
 import com.ablanco.zoomy.Zoomy;
@@ -43,12 +41,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link HomeAdminFragment#newInstance} factory method to
- * create an instance of this fragment.
+/*
+side: shminist
+action: contains the schedule picture and the list of users
+with the option to add and subtract money from the users.
+xml file: fragment_home_shminist.xml
  */
-public class HomeAdminFragment extends Fragment implements EventListener<QuerySnapshot>, View.OnClickListener {
+public class HomeShministFragment extends Fragment implements EventListener<QuerySnapshot>, View.OnClickListener {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -67,7 +66,7 @@ public class HomeAdminFragment extends Fragment implements EventListener<QuerySn
 
     private ArrayList<User> userArrayList = new ArrayList<User>();
 
-    public HomeAdminFragment() {
+    public HomeShministFragment() {
         // Required empty public constructor
     }
 
@@ -79,8 +78,8 @@ public class HomeAdminFragment extends Fragment implements EventListener<QuerySn
      * @param param2 Parameter 2.
      * @return A new instance of fragment HomeAdminFragment.
      */
-    public static HomeAdminFragment newInstance(String param1, String param2) {
-        HomeAdminFragment fragment = new HomeAdminFragment();
+    public static HomeShministFragment newInstance(String param1, String param2) {
+        HomeShministFragment fragment = new HomeShministFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -105,7 +104,7 @@ public class HomeAdminFragment extends Fragment implements EventListener<QuerySn
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home_admin, container, false);
+        View view = inflater.inflate(R.layout.fragment_home_shminist, container, false);
         thiscontext = container.getContext();
         ivSchedule = view.findViewById(R.id.ivSchedule);
         btnPlusDialog = view.findViewById(R.id.btnPlusDialog);

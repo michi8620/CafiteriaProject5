@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CafiteriaProject5">
         <activity
-            android:name=".AdminMainActivity"
+            android:name=".ShministMainActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"

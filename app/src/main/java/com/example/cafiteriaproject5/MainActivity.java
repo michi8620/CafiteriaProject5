@@ -24,13 +24,20 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 
-
+/*
+action: contains the sign up and login buttons. checks if the user is shminist or client.
+it's the first page.
+xml file: activity_main.xml
+ */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     // declare variables.
     private FirebaseFirestore firestore;
     private FirebaseAuth mAuth;
+    private StorageReference storageRef;
     private Button btnRegDialog, btnLogDialog;
     String grade, firstName, lastName, regPassword, regGmail, logGmail, logPassword, type = "client";
 
@@ -39,10 +46,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //always, in every activity:
+        //always, in every activity and fragment:
         firestore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
-
+        storageRef = FirebaseStorage.getInstance().getReference();
         btnRegDialog = findViewById(R.id.btnRegDialog);
         btnLogDialog = findViewById(R.id.btnLogDialog);
         btnRegDialog.setOnClickListener(this);
@@ -63,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String gmailForStart = currentUser.getEmail().toString();
             DocumentReference docRef = firestore.collection("users").document(gmailForStart);
             Intent iClient = new Intent(MainActivity.this, ClientMainActivity.class);
-            Intent iAdmin = new Intent(MainActivity.this, AdminMainActivity.class);
+            Intent iAdmin = new Intent(MainActivity.this, ShministMainActivity.class);
             iClient.putExtra("doc", gmailForStart.toString());
             iAdmin.putExtra("doc", gmailForStart.toString());
             docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -96,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onBackPressed() {
         //do nothing
+        //because I don't want anything to happen when the user clicks 'back'
     }
 
     @Override
@@ -125,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             spinner.setAdapter(adapter);
             spinner.setOnItemSelectedListener(this);
 
+            //שליחת הנתונים
             btnRegister.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -176,6 +185,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         }
                                     }
                                 });
+                        /*StorageReference defaultImageRef = storageRef.child("profiles/"+regGmail+".jpg");
+                        InputStream stream = new FileInputStream(new File());
+
+                        uploadTask = mountainsRef.putStream(stream);
+                        uploadTask.addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Handle unsuccessful uploads
+                            }
+                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                                // ...
+                            }
+                        });*/
 
                     }
                 }
@@ -214,7 +239,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             Toast.makeText(dialogView.getContext(), "התחברת בהצלחה", Toast.LENGTH_SHORT).show();
                                             //check if the user is a client or an admin
                                             Intent iClient = new Intent(MainActivity.this, ClientMainActivity.class);
-                                            Intent iAdmin = new Intent(MainActivity.this, AdminMainActivity.class);
+                                            Intent iAdmin = new Intent(MainActivity.this, ShministMainActivity.class);
                                             iClient.putExtra("doc", logGmail.toString());
                                             iAdmin.putExtra("doc", logGmail.toString());
                                             DocumentReference docRef = firestore.collection("users").document(logGmail);

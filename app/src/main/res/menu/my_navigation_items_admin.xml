@@ -11,6 +11,10 @@
             android:icon="@drawable/ic_baseline_edit_24"
             android:title="עריכת דף הבית של הלקוח"/>
         <item
+            android:id="@+id/nav_emoji_people"
+            android:icon="@drawable/ic_baseline_emoji_people_24"
+            android:title="מוצרים מבוקשים"/>
+        <item
             android:id="@+id/nav_do_not_disturb"
             android:icon="@drawable/ic_baseline_do_not_disturb_24"
             android:title="מסך מנהל"/>
