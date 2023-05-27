@@ -9,5 +9,5 @@
         <item>יא</item>
     </string-array>
     <string name="fragment_home_title">דף הבית</string>
-    <string name="instagram_hyperlink"><a href="https://instagram.com/reem.shministim?igshid=YmMyMTA2M2Y=">reem.shministim</a></string>
+    <string name="instagram_hyperlink">reem.shministim</string>
 </resources>

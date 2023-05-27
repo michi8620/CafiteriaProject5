@@ -4,24 +4,59 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class UserAdapter extends ArrayAdapter<User> {
-    private Context context;
-    private ArrayList<User> userArrayList;
+public class UserAdapter extends RecyclerView.Adapter<UsersViewHolder> {
 
-    public UserAdapter(@NonNull Context context, int resource, @NonNull ArrayList<User> userArrayList){
-        super(context, resource, userArrayList);
+    Context context;
+    List<User> userList;
+
+    private OnItemClickListener listener;
+
+    //interface for clicking the imageView
+    public interface OnItemClickListener{
+        void OnItemClick(int position);
+    }
+
+    //a method for clicking the image
+    public void setOnItemClickListener(UserAdapter.OnItemClickListener clickListener){
+        listener = clickListener;
+    }
+
+    public UserAdapter(@NonNull Context context, @NonNull List<User> userList){
         this.context = context;
-        this.userArrayList = userArrayList;
+        this.userList = userList;
     }
 
     @NonNull
+    @Override
+    public UsersViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Context context = parent.getContext();
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
+
+        View v = layoutInflater.inflate(R.layout.user_row, parent, false);
+        return new UsersViewHolder(v, listener);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull UsersViewHolder holder, int position) {
+        holder.tvUserGmail.setText(userList.get(position).getGmail());
+        holder.tvUserName.setText(userList.get(position).getFirstName());
+        holder.tvUserLastname.setText(userList.get(position).getLastName());
+        holder.tvUserGrade.setText(userList.get(position).getGrade());
+        holder.tvUserMoney.setText(userList.get(position).getMoney()+"");
+    }
+
+    @Override
+    public int getItemCount() {
+        return userList.size();
+    }
+
+    /*@NonNull
     @Override
     public View getView(int position, @NonNull View convertView, @NonNull ViewGroup parent){
         View view = LayoutInflater.from(context).inflate(R.layout.user_row, null, false);
@@ -42,6 +77,6 @@ public class UserAdapter extends ArrayAdapter<User> {
         tvUserMoney.setText(user.getMoney() + "₪");
 
         return view;
-    }
+    }*/
 
 }

@@ -19,18 +19,18 @@
             android:id="@+id/textView25"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="40dp"
-            android:layout_marginEnd="10dp"
             android:text="חוב"
             android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView24"
             app:layout_constraintTop_toBottomOf="@+id/btnMinusDialog" />
 
         <TextView
             android:id="@+id/textView23"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
+            android:layout_marginStart="7dp"
             android:layout_marginTop="40dp"
             android:text="שם משפחה"
             android:textSize="14sp"
@@ -41,7 +41,7 @@
             android:id="@+id/textView22"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="88dp"
+            android:layout_marginStart="75dp"
             android:layout_marginTop="40dp"
             android:text="שם"
             android:textSize="14sp"
@@ -52,7 +52,7 @@
             android:id="@+id/textView24"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="7dp"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="40dp"
             android:text="כיתה"
             android:textSize="14sp"
@@ -84,8 +84,8 @@
             app:layout_constraintTop_toBottomOf="@+id/textView19"
             tools:src="@tools:sample/avatars" />
 
-        <ListView
-            android:id="@+id/lvUsers"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/userRecyclerView"
             android:layout_width="411dp"
             android:layout_height="190dp"
             android:layout_marginTop="70dp"

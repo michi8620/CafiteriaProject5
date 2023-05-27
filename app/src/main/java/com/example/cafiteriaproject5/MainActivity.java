@@ -16,6 +16,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,6 +28,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 
 /*
@@ -41,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button btnRegDialog, btnLogDialog;
     String grade, firstName, lastName, regPassword, regGmail, logGmail, logPassword, type = "client";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnLogDialog = findViewById(R.id.btnLogDialog);
         btnRegDialog.setOnClickListener(this);
         btnLogDialog.setOnClickListener(this);
-
 
     }
 
@@ -185,23 +191,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         }
                                     }
                                 });
-                        /*StorageReference defaultImageRef = storageRef.child("profiles/"+regGmail+".jpg");
-                        InputStream stream = new FileInputStream(new File());
+                        StorageReference defaultImageRef = storageRef.child("profiles/"+regGmail+".jpg");
+                        // Get the drawable resource ID of the image you want to upload
+                        int drawableResource = R.drawable.profile_person;
 
-                        uploadTask = mountainsRef.putStream(stream);
-                        uploadTask.addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                // Handle unsuccessful uploads
-                            }
-                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        // Get the InputStream of the image from the drawable resource
+                        InputStream stream = getResources().openRawResource(+ drawableResource);
+
+                        // Create a byte array to hold the data from the InputStream
+                        byte[] data = new byte[0];
+                        try {
+                            data = new byte[stream.available()];
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                            stream.read(data);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        // Create the upload task and upload the data to Firebase Storage
+                        UploadTask uploadTask = defaultImageRef.putBytes(data);
+                        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                                // ...
+                                // Image uploaded successfully
+                                // Get the download URL of the uploaded image
                             }
-                        });*/
-
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                Log.w("MainActivity", "onFailure: image upload failed", exception);
+                            }
+                        });
                     }
                 }
             });
@@ -236,7 +259,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
                                         if (task.isSuccessful()) {
-                                            Toast.makeText(dialogView.getContext(), "התחברת בהצלחה", Toast.LENGTH_SHORT).show();
                                             //check if the user is a client or an admin
                                             Intent iClient = new Intent(MainActivity.this, ClientMainActivity.class);
                                             Intent iAdmin = new Intent(MainActivity.this, ShministMainActivity.class);
@@ -249,6 +271,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                     if (task.isSuccessful()) {
                                                         DocumentSnapshot document = task.getResult();
                                                         if (document.exists()) {
+                                                            Toast.makeText(dialogView.getContext(), "התחברת בהצלחה", Toast.LENGTH_SHORT).show();
                                                             String typeLog = document.getString("type");
                                                             if(typeLog.equals("client")){
                                                                 startActivity(iClient);

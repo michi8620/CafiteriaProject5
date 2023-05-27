@@ -2,9 +2,11 @@ package com.example.cafiteriaproject5;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,13 +14,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.ablanco.zoomy.TapListener;
 import com.ablanco.zoomy.Zoomy;
@@ -26,6 +29,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -61,8 +65,10 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
     private StorageReference storageReference;
     private Button btnMinusDialog, btnPlusDialog;
     private FirebaseFirestore firestore;
-    private ListView lvUsers;
+    private FirebaseAuth firebaseAuth;
+    private StorageReference storageRef;
     private UserAdapter adapter;
+    private RecyclerView userRecyclerView;
 
     private ArrayList<User> userArrayList = new ArrayList<User>();
 
@@ -96,6 +102,8 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
         }
 
         firestore = FirebaseFirestore.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        storageRef = FirebaseStorage.getInstance().getReference();
 
     }
 
@@ -111,6 +119,66 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
         btnMinusDialog = view.findViewById(R.id.btnMinusDialog);
         btnPlusDialog.setOnClickListener(this);
         btnMinusDialog.setOnClickListener(this);
+        userRecyclerView = view.findViewById(R.id.userRecyclerView);
+        userRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        adapter = new UserAdapter(thiscontext, userArrayList);
+
+        userRecyclerView.setAdapter(adapter);
+
+        adapter.setOnItemClickListener(new UserAdapter.OnItemClickListener() {
+            @Override
+            public void OnItemClick(int position) {
+                AlertDialog.Builder adb = new AlertDialog.Builder(thiscontext);
+                adb.setTitle("האם את/ה בטוח/ה שאת/ה רוצה למחוק את המשתמש " + userArrayList.get(position).getGmail());
+                adb.setPositiveButton("כן", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //delete from firebase
+                        firestore.collection("users")
+                                .document(userArrayList.get(position).getGmail() + "")
+                                .delete()
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.d("HomeShminist", "item deleted successfully");
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w("HomeShminist", "onFailure: item still in firebase, ", e);
+                                    }
+                                });
+                        //delete from auth: can't, gotta ask what to do about it.
+                        //delete the profile
+
+                        // Create a reference to the file to delete
+                        StorageReference profileRef = storageRef.child("profiles/" + userArrayList.get(position).getGmail());
+
+                        // Delete the file
+                        profileRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("HomeShminist", "onSuccess: File deleted successfully");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                Log.w("HomeShminist", "onFailure: ", exception);
+                            }
+                        });
+
+
+                    }
+                });
+                adb.setNegativeButton("לא", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adb.create().dismiss();
+                    }
+                });
+                adb.create().show();
+            }
+        });
 
         storageReference = FirebaseStorage.getInstance().getReference("images/schedule.jpg");
         try {
@@ -151,10 +219,9 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
                 });
         builder.register();
 
-        lvUsers = view.findViewById(R.id.lvUsers);
 
         //הפונקציה הזו גורמת לכך שהרשימה יורדת גם בתוך מסך שיורד
-        lvUsers.setOnTouchListener(new View.OnTouchListener() {
+        userRecyclerView.setOnTouchListener(new View.OnTouchListener() {
             // Setting on Touch Listener for handling the touch inside ScrollView
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -164,9 +231,6 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
             }
         });
 
-        adapter = new UserAdapter(thiscontext, R.layout.user_row, userArrayList);
-
-        lvUsers.setAdapter(adapter);
 
         //listener for the firestore, to see updates in the list
         firestore

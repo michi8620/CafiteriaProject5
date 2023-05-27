@@ -49,4 +49,6 @@ dependencies {
     implementation 'it.sephiroth.android.library.imagezoom:imagezoom:2.3.0'
     implementation 'com.ablanco.zoomy:zoomy:1.1.0'
     implementation 'com.google.android.material:material:<version>'
+
+    implementation 'com.airbnb.android:lottie:3.7.0'
 }
