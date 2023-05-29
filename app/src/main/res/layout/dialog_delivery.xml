@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/shamenet">
 
     <EditText
         android:id="@+id/etCodeDelivery"
@@ -13,6 +14,8 @@
         android:ems="10"
         android:hint="קוד מוצר"
         android:inputType="number"
+        android:textColor="@color/darkRed"
+        android:textColorHint="@color/lightRed"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
@@ -27,6 +30,8 @@
         android:ems="10"
         android:hint="כמות"
         android:inputType="number"
+        android:textColor="@color/darkRed"
+        android:textColorHint="@color/lightRed"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,15 +42,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
+        android:backgroundTint="@color/green"
         android:text="הוספה"
+        android:textColor="@color/darkRed"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etQuantityDelivery" />
 
-    <ListView
-        android:id="@+id/productDialogListView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/productDialogRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -58,10 +65,11 @@
         android:layout_height="44dp"
         android:layout_marginTop="32dp"
         android:gravity="center"
-        android:text="אם רשימת המוצרים אינה נטענת צאו לחצו שוב על &quot;הוסף מוצר&quot;"
+        android:text="אם רשימת המוצרים אינה נטענת צאו ולחצו שוב על &quot;הוסף מוצר&quot;"
+        android:textColor="@color/darkRed"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/productDialogListView" />
+        app:layout_constraintTop_toBottomOf="@+id/productDialogRecyclerView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

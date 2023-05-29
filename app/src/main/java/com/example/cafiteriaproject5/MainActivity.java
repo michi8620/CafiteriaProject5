@@ -21,7 +21,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -152,8 +151,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if(firstName.isEmpty() || lastName.isEmpty() || regPassword.isEmpty() || regGmail.isEmpty() || grade.isEmpty()){
                         Toast.makeText(dialogView.getContext(), "אנא מלא את כל השדות", Toast.LENGTH_SHORT).show();
                     }
-                    else if(!checkPasswordIfNum(regPassword)){
-                        Toast.makeText(MainActivity.this, "סיסמא חייבת להכיל ספרה אחת לפחות", Toast.LENGTH_LONG).show();
+                    else if(!checkPassword(regPassword)){
+                        Toast.makeText(MainActivity.this, "סיסמא חייבת להכיל ספרה אחת לפחות ו6 תווים לפחות", Toast.LENGTH_LONG).show();
                     }
                     else{
                         //creating the user with type = "client"
@@ -182,12 +181,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                             }
                                                         }
                                                     });
-                                        }
-                                        else{
-                                            FirebaseAuthException e = (FirebaseAuthException) task.getException();
-                                            Log.d("MainActivity", e.getMessage()+"");
-                                            //it doesn't check if there's numbers!!!
-                                            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 });
@@ -321,16 +314,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     * @param password (String)
     * @return true or false (boolean)
      */
-    public boolean checkPasswordIfNum(String password){
+    public boolean checkPassword(String password){
         boolean num=false;
         for (int i=0; i<password.length(); i++){
             char ch = password.charAt(i);
             if(Character.isDigit(ch))
                 num = true;
         }
-        if(num){
+        if(num && password.length() >= 6){
             return true;
         }
         return false;
     }
+
 }

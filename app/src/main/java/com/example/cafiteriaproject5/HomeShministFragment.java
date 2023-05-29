@@ -129,7 +129,7 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
             @Override
             public void OnItemClick(int position) {
                 AlertDialog.Builder adb = new AlertDialog.Builder(thiscontext);
-                adb.setTitle("האם את/ה בטוח/ה שאת/ה רוצה למחוק את המשתמש " + userArrayList.get(position).getGmail());
+                adb.setTitle("האם את/ה בטוח/ה שאת/ה רוצה למחוק את המשתמש " + userArrayList.get(position).getGmail() + "?");
                 adb.setPositiveButton("כן", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -319,6 +319,9 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
                     //update the money of the client.
                     if(gmailPlus.isEmpty() || stringMoneyPlus.isEmpty()){
                         Toast.makeText(thiscontext, "אנא מלא את כל השדות", Toast.LENGTH_SHORT).show();
+                    }
+                    else if(moneyPlus > 500){
+                        Toast.makeText(thiscontext, "ניתן להוסיף עד 500 שקלים", Toast.LENGTH_SHORT).show();
                     }
                     else{
                         //firstly we get the current money of the user,

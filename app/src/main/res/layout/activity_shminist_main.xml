@@ -20,16 +20,19 @@
                 android:id="@+id/topAppbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/white"
+                android:background="@color/turkiz"
                 app:navigationIcon="@drawable/ic_baseline_menu_24"
-                app:title="cafeteria" />
+                app:title="cafeteria"
+                app:titleTextColor="@color/darkRed" />
 
         </com.google.android.material.appbar.AppBarLayout>
+
         <FrameLayout
             android:id="@+id/frameLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/appbarLayout" />
+            android:layout_below="@+id/appbarLayout"
+            android:background="@color/turkiz" />
     </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView

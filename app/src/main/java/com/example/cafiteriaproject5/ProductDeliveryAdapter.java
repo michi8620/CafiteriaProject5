@@ -1,30 +1,58 @@
 package com.example.cafiteriaproject5;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
-import org.w3c.dom.Text;
+import java.util.List;
 
-import java.util.ArrayList;
+public class ProductDeliveryAdapter extends RecyclerView.Adapter<ProductDeliveryViewHolder> {
+    Context context;
+    List<ProductDelivery> deliveryList;
 
-public class ProductDeliveryAdapter extends ArrayAdapter<ProductDelivery> {
-    private Context context;
-    private ArrayList<ProductDelivery> deliveryArrayList;
+    private ProductDeliveryAdapter.OnItemClickListener listener;
 
-    public ProductDeliveryAdapter(@NonNull Context context, int resource, @NonNull ArrayList<ProductDelivery> deliveryArrayList){
-        super(context, resource, deliveryArrayList);
-        this.context = context;
-        this.deliveryArrayList = deliveryArrayList;
+    //interface for clicking the imageView
+    public interface OnItemClickListener{
+        void OnItemClick(int position);
     }
 
-    @SuppressLint("SetTextI18n")
+    //a method for clicking the image
+    public void setOnItemClickListener(ProductDeliveryAdapter.OnItemClickListener clickListener){
+        listener = clickListener;
+    }
+
+    public ProductDeliveryAdapter(@NonNull Context context, @NonNull List<ProductDelivery> deliveryList){
+        this.context = context;
+        this.deliveryList = deliveryList;
+    }
+
+    @NonNull
+    @Override
+    public ProductDeliveryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Context context = parent.getContext();
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
+        View v = layoutInflater.inflate(R.layout.product_shopping_row, parent, false);
+        return new ProductDeliveryViewHolder(v, listener);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ProductDeliveryViewHolder holder, int position) {
+        holder.tvProductName.setText(deliveryList.get(position).getName());
+        holder.tvProductQuantity.setText(deliveryList.get(position).getQuantity()+"");
+        holder.tvProductTotal.setText(deliveryList.get(position).getTotal()+"₪");
+    }
+
+    @Override
+    public int getItemCount() {
+        return deliveryList.size();
+    }
+
+    /*@SuppressLint("SetTextI18n")
     @NonNull
     @Override
     public View getView(int position, @NonNull View convertView, @NonNull ViewGroup parent){
@@ -32,16 +60,14 @@ public class ProductDeliveryAdapter extends ArrayAdapter<ProductDelivery> {
         ProductDelivery productDelivery = deliveryArrayList.get(position);
         view.setLayoutDirection(getContext().getResources().getConfiguration().getLayoutDirection());
 
-        TextView tvIndex = view.findViewById(R.id.tvIndex);
         TextView tvProductName = view.findViewById(R.id.tvProductNameShopping);
         TextView tvProductQuantity = view.findViewById(R.id.tvProductQuantityShopping);
         TextView tvProductTotal = view.findViewById(R.id.tvProductTotal);
 
-        tvIndex.setText(productDelivery.getIndex() + "");
         tvProductName.setText(productDelivery.getName() + "");
         tvProductQuantity.setText(productDelivery.getQuantity() + "");
         tvProductTotal.setText(productDelivery.getTotal() + "₪");
 
         return view;
-    }
+    }*/
 }

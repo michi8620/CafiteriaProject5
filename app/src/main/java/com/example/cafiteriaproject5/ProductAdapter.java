@@ -1,43 +1,69 @@
 package com.example.cafiteriaproject5;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
+import java.util.List;
 
 
-public class ProductAdapter extends ArrayAdapter<Product>{
-    private Context context;
-    private ArrayList<Product> productArrayList;
+public class ProductAdapter extends RecyclerView.Adapter<ProductViewHolder>{
+    Context context;
+    List<Product> productList;
+    LayoutInflater inflater;
+    Fragment fragment;
 
-    public ProductAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Product> productArrayList){
-        super(context, resource, productArrayList);
+    private ProductAdapter.OnItemClickListener listener;
+
+    //interface for clicking the imageView
+    public interface OnItemClickListener{
+        void OnItemClick(int position);
+    }
+
+    //a method for clicking the image
+    public void setOnItemClickListener(ProductAdapter.OnItemClickListener clickListener){
+        listener = clickListener;
+    }
+
+    public ProductAdapter(@NonNull Context context, @NonNull List<Product> productList, LayoutInflater inflater, Fragment fragment){
         this.context = context;
-        this.productArrayList = productArrayList;
+        this.productList = productList;
+        this.inflater = inflater;
+        this.fragment = fragment;
     }
 
     @NonNull
     @Override
-    public View getView(int position, @NonNull View convertView, @NonNull ViewGroup parent){
-        @SuppressLint("ViewHolder") View view = LayoutInflater.from(context).inflate(R.layout.product_row, null, false);
-        Product product = productArrayList.get(position);
-        view.setLayoutDirection(getContext().getResources().getConfiguration().getLayoutDirection());
-
-        TextView tvProductName = view.findViewById(R.id.tvProductName);
-        TextView tvProductCode = view.findViewById(R.id.tvProductCode);
-        TextView tvProductPrice = view.findViewById(R.id.tvProductPrice);
-
-        tvProductName.setText(product.getName() + "");
-        tvProductCode.setText(product.getCode() + "");
-        tvProductPrice.setText(product.getPrice() + "₪");
-
-        return view;
+    public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Context context = parent.getContext();
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
+        View v;
+        if(fragment instanceof HomeFragment || fragment instanceof ShoppingFragment){
+            v = inflater.inflate(R.layout.product_client_row, parent, false);
+        } else if(fragment instanceof EditShministFragment){
+            v = layoutInflater.inflate(R.layout.product_row, parent, false);
+        }
+        else{
+            v = layoutInflater.inflate(R.layout.product_row, parent, false);
+        }
+        return new ProductViewHolder(v, listener);
     }
+
+    @Override
+    public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
+        holder.tvProductCode.setText(productList.get(position).getCode()+"");
+        holder.tvProductName.setText(productList.get(position).getName());
+        holder.tvProductPrice.setText(productList.get(position).getPrice()+"");
+    }
+
+    @Override
+    public int getItemCount() {
+        return productList.size();
+    }
+
 }

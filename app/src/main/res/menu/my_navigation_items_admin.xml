@@ -5,27 +5,33 @@
         <item
             android:id="@+id/nav_schedule"
             android:icon="@drawable/ic_baseline_schedule_24"
-            android:title="לוח משמרות"/>
+            android:iconTint="@color/darkRed"
+            android:title="לוח משמרות" />
         <item
             android:id="@+id/nav_shopping_edit"
             android:icon="@drawable/ic_baseline_edit_24"
-            android:title="עריכת דף הבית של הלקוח"/>
+            android:iconTint="@color/darkRed"
+            android:title="עריכת דף הבית של הלקוח" />
         <item
             android:id="@+id/nav_emoji_people"
             android:icon="@drawable/ic_baseline_emoji_people_24"
-            android:title="מוצרים מבוקשים"/>
+            android:iconTint="@color/darkRed"
+            android:title="מוצרים מבוקשים" />
         <item
             android:id="@+id/nav_do_not_disturb"
             android:icon="@drawable/ic_baseline_do_not_disturb_24"
-            android:title="מסך מנהל"/>
+            android:iconTint="@color/darkRed"
+            android:title="מסך מנהל" />
         <item
             android:id="@+id/nav_person"
             android:icon="@drawable/ic_baseline_person_24"
-            android:title="פרופיל"/>
+            android:iconTint="@color/darkRed"
+            android:title="פרופיל" />
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_baseline_logout_24"
-            android:title="יציאה מהחשבון"/>
+            android:iconTint="@color/darkRed"
+            android:title="יציאה מהחשבון" />
     </group>
 
 </menu>

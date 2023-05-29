@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/shamenet">
 
     <EditText
         android:id="@+id/etProductName"
@@ -14,6 +15,8 @@
         android:ems="10"
         android:hint="שם המוצר"
         android:inputType="textPersonName"
+        android:textColor="@color/darkRed"
+        android:textColorHint="@color/lightRed"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.654"
@@ -25,7 +28,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
+        android:backgroundTint="@color/green"
         android:text="הוספה"
+        android:textColor="@color/darkRed"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.16"
@@ -41,6 +46,8 @@
         android:ems="10"
         android:hint="מחיר"
         android:inputType="numberDecimal"
+        android:textColor="@color/darkRed"
+        android:textColorHint="@color/lightRed"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.658"

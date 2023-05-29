@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/turkiz"
     tools:context=".WantedProductsFragment">
 
 
@@ -11,10 +12,11 @@
         android:id="@+id/textView30"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="15dp"
         android:text="בקשת  מוצרים"
-        android:textColor="#9C27B0"
+        android:textColor="@color/darkRed"
         android:textSize="34sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -24,6 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="52dp"
+        android:backgroundTint="@color/lightRed"
         android:text="שלח"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,8 +40,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="52dp"
         android:ems="10"
+        android:hint="לדוגמא: תותים"
         android:inputType="textPersonName"
-        android:text="לדוגמא: תותים"
+        android:textColor="@color/darkRed"
+        android:textColorHint="@color/lightRed"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"

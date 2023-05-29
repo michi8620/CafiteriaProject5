@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/turkiz">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/logo"
@@ -9,7 +10,7 @@
         android:layout_height="50dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
-        android:src="@drawable/cafi_logo"/>
+        android:src="@drawable/logo" />
 
     <TextView
         android:id="@+id/name"
@@ -19,12 +20,13 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="10dp"
         android:text="Cafeteria"
-        android:textColor="@color/black"
+        android:textColor="@color/darkRed"
         android:textSize="16dp"
         android:textStyle="bold" />
+
     <View
-        android:layout_below="@+id/name"
+        style="@style/line"
         android:layout_width="match_parent"
-        style="@style/line" />
+        android:layout_below="@+id/name" />
 
 </RelativeLayout>

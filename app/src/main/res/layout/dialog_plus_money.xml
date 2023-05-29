@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/shamenet">
 
     <EditText
         android:id="@+id/etGmailPlus"
@@ -13,7 +14,9 @@
         android:ems="10"
         android:hint="אימייל"
         android:inputType="textPersonName"
-        android:textSize="20sp"
+        android:textColor="@color/darkRed"
+        android:textColorHint="@color/lightRed"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
@@ -27,7 +30,9 @@
         android:ems="10"
         android:hint="סכום כסף להוספה"
         android:inputType="numberDecimal"
-        android:textSize="20sp"
+        android:textColor="@color/darkRed"
+        android:textColorHint="@color/lightRed"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +44,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="36dp"
         android:layout_marginTop="28dp"
+        android:backgroundTint="@color/green"
         android:text="הוספה"
+        android:textColor="@color/darkRed"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etMoneyPlus" />

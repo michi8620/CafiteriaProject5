@@ -2,22 +2,29 @@ package com.example.cafiteriaproject5;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -27,13 +34,21 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import nl.dionsegijn.konfetti.core.PartyFactory;
+import nl.dionsegijn.konfetti.core.emitter.Emitter;
+import nl.dionsegijn.konfetti.core.emitter.EmitterConfig;
+import nl.dionsegijn.konfetti.core.models.Shape;
+import nl.dionsegijn.konfetti.core.models.Size;
+import nl.dionsegijn.konfetti.xml.KonfettiView;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements EventListener<QuerySnapshot> {
+public class HomeFragment extends Fragment implements EventListener<QuerySnapshot>, ShakeDetector.OnShakeListener {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -45,12 +60,23 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
     private String mParam2;
 
     private FirebaseFirestore firestore;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    private String gmail = "";
+    private Double currentMoney=0.0;
+    private boolean gift;
+
     private TextView tvTitleClient, tvTextClient;
 
-    private ListView productListViewClient;
+    private RecyclerView productRecyclerViewClient;
     private ProductAdapter adapter;
 
     private ArrayList<Product> productArrayListClient = new ArrayList<Product>();
+
+    private ShakeDetector shakeDetector;
+    private KonfettiView konfettiView;
+    private Shape.DrawableShape drawableShape;
+    private EmitterConfig emitterConfig;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -102,6 +128,8 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
         }
 
         firestore = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -114,10 +142,16 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
         tvTextClient = view.findViewById(R.id.tvTextClient);
         tvTitleClient = view.findViewById(R.id.tvTitleClient);
 
-        productListViewClient = view.findViewById(R.id.listViewProductClient);
+        shakeDetector = new ShakeDetector(thiscontext);
+        shakeDetector.setOnShakeListener(this);
+        konfettiView = view.findViewById(R.id.konfettiView);
+        drawableShape = new Shape.DrawableShape(AppCompatResources.getDrawable(thiscontext, R.drawable.ic_baseline_android), true);
+
+        productRecyclerViewClient = view.findViewById(R.id.recyclerViewProductClient);
+        productRecyclerViewClient.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
         //הפונקציה הזו גורמת לכך שהרשימה יורדת גם בתוך מסך שיורד
-        productListViewClient.setOnTouchListener(new View.OnTouchListener() {
+        productRecyclerViewClient.setOnTouchListener(new View.OnTouchListener() {
             // Setting on Touch Listener for handling the touch inside ScrollView
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -127,9 +161,43 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
             }
         });
 
-        adapter = new ProductAdapter(thiscontext, R.layout.product_row, productArrayListClient);
+        adapter = new ProductAdapter(thiscontext, productArrayListClient, inflater, this);
 
-        productListViewClient.setAdapter(adapter);
+        productRecyclerViewClient.setAdapter(adapter);
+
+        adapter.setOnItemClickListener(new ProductAdapter.OnItemClickListener() {
+            @Override
+            public void OnItemClick(int position) {
+                androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(thiscontext);
+                adb.setTitle("האם את/ה בטוח/ה שאת/ה רוצה למחוק את המוצר " + productArrayListClient.get(position).getName() + "?");
+                adb.setPositiveButton("כן", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String productCode = productArrayListClient.get(position).getCode() + "";
+                        firestore.collection("products").document(productCode)
+                                .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Toast.makeText(thiscontext, "נמחק בהצלחה", Toast.LENGTH_SHORT).show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w("EditAdminFragment", "onFailure: Error deleting document", e);
+                                    }
+                                });
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+                adb.setNegativeButton("לא", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adb.create().dismiss();
+                    }
+                });
+                adb.create().show();
+            }
+        });
 
         //listener for the firestore, to see updates in the list
         firestore
@@ -185,5 +253,78 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
         }
 
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        shakeDetector.start();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        shakeDetector.stop();
+    }
+
+    @Override
+    public void onShake() {
+        // The konfetti doesn't work anymore and idk why
+        emitterConfig = new Emitter(300, TimeUnit.MILLISECONDS).max(300);
+        Log.d("HomeFragment", "onShake: konfetti");
+        konfettiView.start(
+                new PartyFactory(emitterConfig)
+                        .shapes(Shape.Circle.INSTANCE, Shape.Square.INSTANCE, drawableShape)
+                        .spread(360)
+                        .position(0.5, 0.25, 1, 1)
+                        .sizes(new Size(8,50,10))
+                        .timeToLive(3000)
+                        .fadeOutEnabled(true)
+                        .build()
+        );
+        //get the email from the FirebaseAuth
+        user = mAuth.getCurrentUser();
+        if(user != null){
+            gmail = user.getEmail();
+        }
+        //get the current money
+        firestore.collection("users").document(gmail+"")
+                        .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            if(documentSnapshot.exists()) {
+                                currentMoney = documentSnapshot.getDouble("money");
+                                gift = documentSnapshot.getBoolean("gift");
+                                if(!gift){
+                                    //add 10 shekels
+                                    firestore.collection("users").document(gmail+"")
+                                            .update("money", currentMoney+10)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+                                                    firestore.collection("users").document(gmail+"")
+                                                                    .update("gift", true)
+                                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                @Override
+                                                                                public void onSuccess(Void unused) {
+                                                                                    Toast.makeText(thiscontext, "קיבלת 10 שקל מתנה מאיתנו!", Toast.LENGTH_SHORT).show();
+                                                                                }
+                                                                            });
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.w("HomeFragment", "onFailure: ", e);
+                                                }
+                                            });
+                                } else{
+                                    Toast.makeText(thiscontext, "לא ניתן לקבל את המתנה יותר מפעם אחת", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+                    }
+                });
     }
 }

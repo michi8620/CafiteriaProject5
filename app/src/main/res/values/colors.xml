@@ -9,5 +9,10 @@
     <color name="white">#FFFFFFFF</color>
     <color name="lightGray">#989797</color>
     <color name="underline">#D8D6D6</color>
-    <color name="red">#E91E63</color>
+
+    <color name="darkRed">#a44a3f</color>
+    <color name="lightRed">#f19c79</color>
+    <color name="turkiz">#cbdfbd</color>
+    <color name="shamenet">#f6f4d2</color>
+    <color name="green">#d4e09b</color>
 </resources>

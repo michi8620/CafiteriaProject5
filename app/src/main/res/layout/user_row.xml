@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="30dp">
+    android:layout_height="30dp"
+    android:background="@color/turkiz">
 
     <TextView
         android:id="@+id/tvUserGmail"
@@ -11,6 +12,7 @@
         android:layout_weight="1"
         android:paddingLeft="10dp"
         android:text="אימייל"
+        android:textColor="@color/darkRed"
         android:textSize="16sp" />
 
     <TextView
@@ -20,6 +22,7 @@
         android:layout_weight="1"
         android:paddingRight="5dp"
         android:text="שם"
+        android:textColor="@color/darkRed"
         android:textSize="16sp" />
 
     <TextView
@@ -29,6 +32,7 @@
         android:layout_weight="1"
         android:paddingRight="5dp"
         android:text="שם משפחה"
+        android:textColor="@color/darkRed"
         android:textSize="16sp" />
 
     <TextView
@@ -38,6 +42,7 @@
         android:layout_weight="1"
         android:paddingRight="5dp"
         android:text="שכבה"
+        android:textColor="@color/darkRed"
         android:textSize="16sp" />
 
     <TextView
@@ -47,6 +52,7 @@
         android:layout_weight="1"
         android:paddingRight="5dp"
         android:text="כסף בקופה"
+        android:textColor="@color/darkRed"
         android:textSize="16sp" />
 
     <ImageView

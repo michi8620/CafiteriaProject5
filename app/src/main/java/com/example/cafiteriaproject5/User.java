@@ -8,7 +8,7 @@ public class User {
     private String password;
     private String type;
     private double money;
-
+    private boolean gift;
 
     public User(String firstName, String lastName, String gmail, String grade, String password, String type) {
         this.firstName = firstName;
@@ -18,17 +18,16 @@ public class User {
         this.password = password;
         this.type = type;
         this.money = 0;
+        this.gift=false;
     }
 
+    //constructor for recyclerView showing only this info
     public User(String firstName, String lastName, String gmail, String grade, Double money) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gmail = gmail;
         this.grade = grade;
         this.money = money;
-    }
-
-    public User() {
     }
 
     public String getType(){return type;}
@@ -78,4 +77,8 @@ public class User {
     public double getMoney() {return money;}
 
     public void setMoney(double money) {this.money = money;}
+
+    public boolean isGift() {return gift;}
+
+    public void setGift(boolean gift) {this.gift = gift;}
 }

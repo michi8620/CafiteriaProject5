@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FDCADB"
+    android:background="@color/turkiz"
     tools:context=".MainActivity">
 
     <TextView
@@ -12,8 +12,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="124dp"
-        android:text="הקפי"
-        android:textColor="#9C27B0"
+        android:text="קפי"
+        android:textColor="@color/darkRed"
         android:textSize="60sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,6 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="196dp"
+        android:backgroundTint="@color/lightRed"
         android:text="הרשמה"
         android:textSize="34sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,6 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="56dp"
+        android:backgroundTint="@color/lightRed"
         android:text="התחברות"
         android:textSize="34sp"
         app:layout_constraintEnd_toEndOf="parent"

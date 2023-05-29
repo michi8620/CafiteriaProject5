@@ -31,7 +31,7 @@ contains checking if the shminist is admin while entering "do_not_disturb"
 and the replaceFragment function.
 xml file: activity_admin_main
  */
-public class ShministMainActivity extends AppCompatActivity {
+public class ShministMainActivity extends AppCompatActivity{
     MaterialToolbar toolbar;
     DrawerLayout drawerLayout;
     NavigationView navigationView;

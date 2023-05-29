@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/turkiz"
     android:padding="10dp">
-
-    <TextView
-        android:id="@+id/tvIndex"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:paddingRight="5dp"
-        android:text="מספר" />
 
     <TextView
         android:id="@+id/tvProductNameShopping"
@@ -18,7 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:paddingRight="5dp"
-        android:text="שם" />
+        android:text="שם"
+        android:textColor="@color/darkRed" />
 
     <TextView
         android:id="@+id/tvProductQuantityShopping"
@@ -26,7 +21,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:paddingRight="5dp"
-        android:text="כמות" />
+        android:text="כמות"
+        android:textColor="@color/darkRed" />
 
     <TextView
         android:id="@+id/tvProductTotal"
@@ -34,6 +30,14 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:paddingRight="5dp"
-        android:text="סהכ" />
+        android:text="סהכ"
+        android:textColor="@color/darkRed" />
+
+    <ImageView
+        android:id="@+id/ivDeleteDelivery"
+        android:layout_width="2dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        app:srcCompat="@drawable/ic_baseline_delete_24" />
 
 </LinearLayout>

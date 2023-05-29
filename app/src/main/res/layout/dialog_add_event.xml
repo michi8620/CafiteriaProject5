@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/shamenet">
 
     <EditText
         android:id="@+id/etTitle"
@@ -13,6 +14,8 @@
         android:ems="10"
         android:hint="כותרת"
         android:inputType="textPersonName"
+        android:textColor="@color/darkRed"
+        android:textColorHint="@color/lightRed"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.766"
@@ -28,6 +31,8 @@
         android:gravity="start|top"
         android:hint="טקסט"
         android:inputType="textMultiLine"
+        android:textColor="@color/darkRed"
+        android:textColorHint="@color/lightRed"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="@+id/etTitle"
         app:layout_constraintStart_toStartOf="@+id/etTitle"
@@ -38,7 +43,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
+        android:backgroundTint="@color/green"
         android:text="הוספה"
+        android:textColor="@color/darkRed"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="@+id/etText"
         app:layout_constraintHorizontal_bias="0.184"

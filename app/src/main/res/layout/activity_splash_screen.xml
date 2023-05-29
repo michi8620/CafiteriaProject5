@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#cbdfbd"
+    android:background="@color/turkiz"
     tools:context=".SplashScreen">
 
     <TextView
@@ -14,7 +14,7 @@
         android:text="Cafe"
         android:textSize="30sp"
         android:textStyle="bold"
-        android:textColor="#a44a3f"
+        android:textColor="@color/darkRed"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_margin="20dp"

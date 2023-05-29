@@ -4,16 +4,17 @@ import static it.sephiroth.android.library.imagezoom.ImageViewTouchBase.TAG;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,8 +22,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -57,18 +62,19 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
     Context thisContext;
     private FirebaseFirestore firestore;
     private TextView tvSum;
-    private Button btnDeliveryDialog, btnSendDelivery, btnRemoveDialog;
+    private Button btnDeliveryDialog, btnSendDelivery;
     private EditText etCodeDelivery, etQuantityDelivery;
-    private ListView deliveryListView;
+    private RecyclerView deliveryRecyclerView;
     private ProductDeliveryAdapter adapter;
     private String fullName = "", grade = "", message = "", roomNum = "", comment = "";
     private double sum=0;
     private static int index=0;
+    private int roomNumInt;
 
     private ArrayList<ProductDelivery> deliveryArrayList = new ArrayList<>();
 
-    private ListView productDialogListView;
-    private ProductAdapter adapter2;
+    private RecyclerView productDialogRecyclerView;
+    private ProductAdapter adapterDialog;
 
     private ArrayList<Product> productDialogArrayList = new ArrayList<>();
 
@@ -103,16 +109,15 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
         thisContext = view.getContext();
         btnDeliveryDialog = view.findViewById(R.id.btnDeliveryDialog);
         btnSendDelivery = view.findViewById(R.id.btnSendDelivery);
-        btnRemoveDialog = view.findViewById(R.id.btnRemoveDialog);
-        deliveryListView = view.findViewById(R.id.listViewDelivery);
+        deliveryRecyclerView = view.findViewById(R.id.recyclerViewDelivery);
         tvSum = view.findViewById(R.id.tvSum);
 
-        adapter = new ProductDeliveryAdapter(thisContext, R.layout.product_shopping_row, deliveryArrayList);
-        deliveryListView.setAdapter(adapter);
+        adapter = new ProductDeliveryAdapter(thisContext, deliveryArrayList);
+        deliveryRecyclerView.setAdapter(adapter);
+        deliveryRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
         btnDeliveryDialog.setOnClickListener(this);
         btnSendDelivery.setOnClickListener(this);
-        btnRemoveDialog.setOnClickListener(this);
 
 
         return view;
@@ -134,9 +139,74 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
             etCodeDelivery = dialogView.findViewById(R.id.etCodeDelivery);
             etQuantityDelivery = dialogView.findViewById(R.id.etQuantityDelivery);
             Button btnAddDelivery = dialogView.findViewById(R.id.btnAddDelivery);
-            productDialogListView = dialogView.findViewById(R.id.productDialogListView);
-            adapter2 = new ProductAdapter(thisContext, R.layout.product_shopping_row, productDialogArrayList);
-            productDialogListView.setAdapter(adapter2);
+            productDialogRecyclerView = dialogView.findViewById(R.id.productDialogRecyclerView);
+            adapterDialog = new ProductAdapter(thisContext, productDialogArrayList, getLayoutInflater(), this);
+            productDialogRecyclerView.setAdapter(adapterDialog);
+            productDialogRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+
+            adapterDialog.setOnItemClickListener(new ProductAdapter.OnItemClickListener() {
+                @Override
+                public void OnItemClick(int position) {
+                    androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(thisContext);
+                    adb.setTitle("האם את/ה בטוח/ה שאת/ה רוצה למחוק את המוצר " + productDialogArrayList.get(position).getName() + "?");
+                    adb.setPositiveButton("כן", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String productCode = productDialogArrayList.get(position).getCode() + "";
+                            firestore.collection("products").document(productCode)
+                                    .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            Toast.makeText(thisContext, "נמחק בהצלחה", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w("EditAdminFragment", "onFailure: Error deleting document", e);
+                                        }
+                                    });
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                    adb.setNegativeButton("לא", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            adb.create().dismiss();
+                        }
+                    });
+                    adb.create().show();
+                }
+            });
+
+            adapter.setOnItemClickListener(new ProductDeliveryAdapter.OnItemClickListener() {
+                @Override
+                public void OnItemClick(int position) {
+                    androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(thisContext);
+                    adb.setTitle("האם את/ה בטוח/ה שאת/ה רוצה למחוק את המוצר " + deliveryArrayList.get(position).getName() + " מהרשימה?");
+                    adb.setPositiveButton("כן", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if(position < deliveryArrayList.size()){
+                                sum-=deliveryArrayList.get(position).getTotal();
+                                tvSum.setText(sum + "");
+                                deleteDelivery(deliveryArrayList, position);
+                                index--;
+                                adapter.notifyDataSetChanged();
+                            }
+                            else{
+                                Toast.makeText(thisContext, "מספר לא קיים", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                    adb.setNegativeButton("לא", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            adb.create().dismiss();
+                        }
+                    });
+                    adb.create().show();
+                }
+            });
 
             //בחלק זה אנו בונים את הרשימה שבתוך הדיאלוג על מנת שהמשתמש יראה את הקודים של המוצרים
             //listener for the firestore, to see updates in the list
@@ -242,39 +312,6 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
                 }
             });
         }
-        if(view == btnRemoveDialog){
-            //הבונה של הדיאלוג
-            AlertDialog.Builder builder = new AlertDialog.Builder(thisContext);
-            // יצירת הוויאו של הדיאלוג על ידי קריאת קובץ האקסמל
-            View dialogView = getLayoutInflater().inflate(R.layout.dialog_remove_delivery, null, false);
-            //Sets a custom view to be the contents of the alert dialog.
-            builder.setView(dialogView);
-            //Creates an AlertDialog with the arguments supplied to this builder.
-            AlertDialog alert = builder.create();
-            alert.show();
-
-            EditText etIndex = dialogView.findViewById(R.id.etIndex);
-            Button btnRemoveDelivery = dialogView.findViewById(R.id.btnRemoveDelivery);
-
-            btnRemoveDelivery.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    int indexNum = Integer.parseInt(etIndex.getText().toString());
-                    indexNum-=1;
-                    if(indexNum < deliveryArrayList.size()){
-                        sum-=deliveryArrayList.get(indexNum).getTotal();
-                        tvSum.setText(sum + "");
-                        deleteDelivery(deliveryArrayList, indexNum);
-                        index--;
-                        adapter.notifyDataSetChanged();
-                        alert.dismiss();
-                    }
-                    else{
-                        Toast.makeText(thisContext, "מספר לא קיים", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        }
         if (view == btnSendDelivery) {
             //check if there's products in the delivery
             if(deliveryArrayList.isEmpty()){
@@ -297,70 +334,90 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
                 btnSendDelivery2.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                        if (user != null) {
-                            String email = user.getEmail();
-                            DocumentReference docRef = firestore.collection("users").document(email);
-                            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    if (task.isSuccessful()) {
-                                        DocumentSnapshot document = task.getResult();
-                                        if (document.exists()) {
-                                            fullName = document.getString("firstName") + " " + document.getString("lastName");
-                                            grade = document.getString("grade");
-                                            roomNum = etRoomNum.getText().toString();
-                                            comment = etComment.getText().toString();
-
-
-                                            String emailReceiver = "shministboyarreciever@gmail.com";
-                                            String subject = "משלוח חדש!";
-                                            message = "מבקש המשלוח: " + fullName + "\n שכבה: " + grade + "\n חדר: " + roomNum + "\n";
-                                            message += comment + "\n" + "רשימת המוצרים:" + "\n";
-                                            //makes the list to string
-                                            if(deliveryArrayList != null){
-                                                String listString = deliveryArrayList.stream().map(Object::toString)
-                                                        .collect(Collectors.joining("\n"));
-                                                message += listString;
-                                                //המבנה של ההודעה הוא כזה:
-                                                //מבקש המשלוח: [שם ושם משפחה]
-                                                //שכבה: [שכבה]
-                                                //חדר: [חדר]
-                                                //הערות: [הערות]
-                                                //רשימת המוצרים:
-                                                //1. 2 ביסלי
-                                                // 2. 1 תפוצ'יפס
-
-                                                String[] addresses = emailReceiver.split(",");
-
-                                                Intent intent = new Intent(Intent.ACTION_SENDTO);
-                                                intent.setData(Uri.parse("mailto:"));
-                                                intent.putExtra(Intent.EXTRA_EMAIL, addresses);
-                                                intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-                                                intent.putExtra(Intent.EXTRA_TEXT, message);
-
-                                                try{
-                                                    startActivity(intent);
-                                                }
-                                                catch(Exception e){
-                                                    Toast.makeText(thisContext, "No email app is installed" + e.getMessage().toString(), Toast.LENGTH_LONG).show();
-                                                }
-                                            }
-                                            else{
-                                                Toast.makeText(thisContext, "הוסף מוצרים למשלוח", Toast.LENGTH_SHORT).show();
-                                            }
-                                        } else {
-                                            Log.d(TAG, "onComplete: document does not exist");
-                                        }
-                                    } else {
-                                        Log.d(TAG, "onComplete: task is not successful");
-                                    }
-                                }
-                            });
+                        roomNum = etRoomNum.getText().toString();
+                        if(!roomNum.equals(""))
+                            roomNumInt = Integer.parseInt(roomNum);
+                        comment = etComment.getText().toString();
+                        if(roomNumInt > 100){
+                            Toast.makeText(thisContext, "מספר חדר לא תקין", Toast.LENGTH_SHORT).show();
+                        }
+                        else if(roomNum.equals("")){
+                            Toast.makeText(thisContext, "אנא כתוב מספר חדר", Toast.LENGTH_SHORT).show();
                         }
                         else{
-                            Log.d(TAG, "btnSendDelivery: no user is registered");
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            if (user != null) {
+                                String email = user.getEmail();
+                                DocumentReference docRef = firestore.collection("users").document(email);
+                                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot document = task.getResult();
+                                            if (document.exists()) {
+                                                fullName = document.getString("firstName") + " " + document.getString("lastName");
+                                                grade = document.getString("grade");
+
+
+                                                String emailReceiver = "shministboyarreciever@gmail.com";
+                                                String subject = "משלוח חדש!";
+                                                message = "מבקש המשלוח: " + fullName + "\n שכבה: " + grade + "\n חדר: " + roomNum + "\n";
+                                                message += comment + "\n" + "רשימת המוצרים:" + "\n";
+                                                //makes the list to string
+                                                if(deliveryArrayList != null){
+                                                    //מסדר את ההודעה של המשלוח
+                                                    String listString = deliveryArrayList.stream().map(Object::toString)
+                                                            .collect(Collectors.joining("\n"));
+                                                    message += listString;
+                                                    //המבנה של ההודעה הוא כזה:
+                                                    //מבקש המשלוח: [שם ושם משפחה]
+                                                    //שכבה: [שכבה]
+                                                    //חדר: [חדר]
+                                                    //הערות: [הערות]
+                                                    //רשימת המוצרים:
+                                                    //1. 2 ביסלי
+                                                    // 2. 1 תפוצ'יפס
+
+                                                    String[] addresses = emailReceiver.split(",");
+
+                                                    Intent intent = new Intent(Intent.ACTION_SENDTO);
+                                                    intent.setData(Uri.parse("mailto:"));
+                                                    intent.putExtra(Intent.EXTRA_EMAIL, addresses);
+                                                    intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+                                                    intent.putExtra(Intent.EXTRA_TEXT, message);
+
+                                                    try{
+                                                        startActivity(intent);
+                                                        alert.dismiss();
+                                                        Handler handler = new Handler();
+                                                        handler.postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                Toast.makeText(thisContext, "הזמנתך נשלחה בהצלחה", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        }, 7000);
+                                                    }
+                                                    catch(Exception e){
+                                                        Toast.makeText(thisContext, "No email app is installed" + e.getMessage(), Toast.LENGTH_LONG).show();
+                                                    }
+                                                }
+                                                else{
+                                                    Toast.makeText(thisContext, "הוסף מוצרים למשלוח", Toast.LENGTH_SHORT).show();
+                                                }
+                                            } else {
+                                                Log.d(TAG, "onComplete: document does not exist");
+                                            }
+                                        } else {
+                                            Log.d(TAG, "onComplete: task is not successful");
+                                        }
+                                    }
+                                });
+                            }
+                            else{
+                                Log.d(TAG, "btnSendDelivery: no user is registered");
+                            }
                         }
+
                     }
                 });
             }

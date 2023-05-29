@@ -13,6 +13,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/turkiz"
         tools:context=".EditShministFragment">
 
 
@@ -22,6 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:text="קוד מוצר"
+            android:textColor="@color/darkRed"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -35,6 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:text="מחיר"
+            android:textColor="@color/darkRed"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -48,6 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:text="מוצר"
+            android:textColor="@color/darkRed"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -61,7 +65,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="80dp"
             android:text="רשימת המוצרים"
-            android:textSize="24sp"
+            android:textColor="@color/darkRed"
+            android:textSize="34sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
@@ -73,6 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="30dp"
+            android:backgroundTint="@color/darkRed"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -83,6 +90,8 @@
             android:layout_width="333dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:textColor="@color/darkRed"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -92,10 +101,11 @@
             android:id="@+id/textView8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="15dp"
             android:text="@string/fragment_home_title"
-            android:textColor="#9C27B0"
+            android:textColor="@color/darkRed"
             android:textSize="34sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.467"
             app:layout_constraintStart_toStartOf="parent"
@@ -106,6 +116,7 @@
             style="@style/line"
             android:layout_width="match_parent"
             android:layout_marginTop="16dp"
+            android:backgroundTint="@color/darkRed"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -116,14 +127,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="52dp"
+            android:textColor="@color/darkRed"
             android:textSize="24sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
-        <ListView
-            android:id="@+id/listViewProductClient"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewProductClient"
             android:layout_width="409dp"
             android:layout_height="357dp"
             android:layout_marginTop="60dp"
@@ -131,6 +144,15 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView14" />
+
+        <nl.dionsegijn.konfetti.xml.KonfettiView
+            android:id="@+id/konfettiView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

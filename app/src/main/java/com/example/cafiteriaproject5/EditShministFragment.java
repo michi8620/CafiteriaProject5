@@ -3,22 +3,23 @@ package com.example.cafiteriaproject5;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -65,8 +66,7 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
     private TextView tvTitle, tvText;
     private static int productCode = 99;
 
-    //I need to go to zipi more. there's better ways.
-    private ListView productListView;
+    private RecyclerView productRecyclerView;
     private ProductAdapter adapter;
 
     private ArrayList<Product> productArrayList = new ArrayList<Product>();
@@ -142,9 +142,11 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
         btnAddProductDialog.setOnClickListener(this);
         btnChangePriceDialog.setOnClickListener(this);
 
-        productListView = view.findViewById(R.id.listViewProduct);
+        productRecyclerView = view.findViewById(R.id.recyclerViewProduct);
+        productRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+
         //הפונקציה הזו גורמת לכך שהרשימה יורדת גם בתוך מסך שיורד
-        productListView.setOnTouchListener(new View.OnTouchListener() {
+        productRecyclerView.setOnTouchListener(new View.OnTouchListener() {
             // Setting on Touch Listener for handling the touch inside ScrollView
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -154,9 +156,43 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
             }
         });
 
-        adapter = new ProductAdapter(thiscontext, R.layout.product_row, productArrayList);
+        adapter = new ProductAdapter(thiscontext, productArrayList, inflater, this);
 
-        productListView.setAdapter(adapter);
+        productRecyclerView.setAdapter(adapter);
+
+        adapter.setOnItemClickListener(new ProductAdapter.OnItemClickListener() {
+            @Override
+            public void OnItemClick(int position) {
+                androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(thiscontext);
+                adb.setTitle("האם את/ה בטוח/ה שאת/ה רוצה למחוק את המוצר " + productArrayList.get(position).getName() + "?");
+                adb.setPositiveButton("כן", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String productCode = productArrayList.get(position).getCode() + "";
+                        firestore.collection("products").document(productCode)
+                                .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Toast.makeText(thiscontext, "נמחק בהצלחה", Toast.LENGTH_SHORT).show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w("EditAdminFragment", "onFailure: Error deleting document", e);
+                                    }
+                                });
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+                adb.setNegativeButton("לא", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adb.create().dismiss();
+                    }
+                });
+                adb.create().show();
+            }
+        });
 
         //listener for the firestore, to see updates in the list
         firestore
@@ -191,29 +227,6 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
                         }
                     }
                 });
-
-        //delete a product if the user presses long on it.
-        productListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                //deletes a document
-                String productCode = productArrayList.get(position).getCode() + "";
-                firestore.collection("products").document(productCode)
-                        .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        Log.d("EditAdminFragment", "onSuccess: deleted document successfully");
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("EditAdminFragment", "onFailure: Error deleting document", e);
-                            }
-                        });
-                adapter.notifyDataSetChanged();
-                return false;
-            }
-        });
         return view;
     }
 
