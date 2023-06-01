@@ -6,6 +6,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -62,14 +64,16 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
     Context thisContext;
     private FirebaseFirestore firestore;
     private TextView tvSum;
-    private Button btnDeliveryDialog, btnSendDelivery;
+    private Button btnDeliveryDialog, btnSendDelivery, btnBitDialog;
     private EditText etCodeDelivery, etQuantityDelivery;
     private RecyclerView deliveryRecyclerView;
     private ProductDeliveryAdapter adapter;
     private String fullName = "", grade = "", message = "", roomNum = "", comment = "";
+    private String name="", lastName="", indexStr="";
     private double sum=0;
     private static int index=0;
     private int roomNumInt;
+    private int highestCode = 0;
 
     private ArrayList<ProductDelivery> deliveryArrayList = new ArrayList<>();
 
@@ -99,6 +103,35 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         firestore = FirebaseFirestore.getInstance();
+
+        /*
+        This method is used to get the highestCode from the WantedProducts collection
+        so when I add a wantedProduct its id will not be the same as the others.
+        It's in the OnCreate method because if I put it in the Onclick it will run at the end.
+         */
+        firestore.collection("bit")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            //כאן אנחנו יכולים לראות אם יש שינוי כלשהו ברשימה
+                            List<DocumentSnapshot> wantedProductDocList = task.getResult().getDocuments();
+                            // נותן את כל המסמכים שיש בדוקיומנט.
+
+                            for(DocumentSnapshot doc : wantedProductDocList){
+                                int docCode = Integer.parseInt(doc.getString("code"));
+                                if(highestCode < docCode){
+                                    highestCode = docCode;
+                                }
+                            }
+                            Log.d("ShoppingFragment", "Onclick1: HighestCode: " + highestCode);
+
+                        } else{
+                            Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     @Override
@@ -109,6 +142,7 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
         thisContext = view.getContext();
         btnDeliveryDialog = view.findViewById(R.id.btnDeliveryDialog);
         btnSendDelivery = view.findViewById(R.id.btnSendDelivery);
+        btnBitDialog = view.findViewById(R.id.btnBitDialog);
         deliveryRecyclerView = view.findViewById(R.id.recyclerViewDelivery);
         tvSum = view.findViewById(R.id.tvSum);
 
@@ -118,7 +152,7 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
 
         btnDeliveryDialog.setOnClickListener(this);
         btnSendDelivery.setOnClickListener(this);
-
+        btnBitDialog.setOnClickListener(this);
 
         return view;
     }
@@ -395,7 +429,9 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
                                                             public void run() {
                                                                 Toast.makeText(thisContext, "הזמנתך נשלחה בהצלחה", Toast.LENGTH_SHORT).show();
                                                             }
-                                                        }, 7000);
+                                                        }, 10000);
+                                                        deliveryArrayList.clear();
+                                                        adapter.notifyDataSetChanged();
                                                     }
                                                     catch(Exception e){
                                                         Toast.makeText(thisContext, "No email app is installed" + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -422,6 +458,79 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
                 });
             }
 
+        }
+        if(view == btnBitDialog){
+            //הבונה של הדיאלוג
+            AlertDialog.Builder builder = new AlertDialog.Builder(thisContext);
+            // יצירת הוויאו של הדיאלוג על ידי קריאת קובץ האקסמל
+            View dialogView = getLayoutInflater().inflate(R.layout.dialog_bitpay, null, false);
+            //Sets a custom view to be the contents of the alert dialog.
+            builder.setView(dialogView);
+            //Creates an AlertDialog with the arguments supplied to this builder.
+            AlertDialog alert = builder.create();
+            alert.show();
+
+            Button btnBitLink = alert.findViewById(R.id.btnBitLink);
+            Button btnSendInfo = alert.findViewById(R.id.btnSendInfo);
+            btnBitLink.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Uri webpage = Uri.parse("https://www.bitpay.co.il/app/TapToPay");
+                    Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+                    intent.setPackage("com.bitpay.wallet");
+                    if (isIntentAvailable(thisContext, intent)){
+                        startActivity(intent);
+                    } else{
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.bitpay.co.il/app/TapToPay")));
+                    }
+                }
+            });
+            btnSendInfo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    String email = user.getEmail();
+                    firestore.collection("users").document(email+"")
+                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if(task.isSuccessful()){
+                                        DocumentSnapshot documentSnapshot = task.getResult();
+                                        if(documentSnapshot.exists()){
+                                            name = documentSnapshot.getString("firstName");
+                                            lastName = documentSnapshot.getString("lastName");
+                                            for (int i=0; i<deliveryArrayList.size(); i++){
+                                                String product, quantity;
+                                                product = deliveryArrayList.get(i).getName();
+                                                quantity = deliveryArrayList.get(i).getQuantity()+"";
+                                                indexStr = deliveryArrayList.get(i).getIndex()+"";
+                                                Log.d("ShoppingFragment", "onComplete: " + highestCode);
+                                                firestore.collection("bit").document((highestCode+1)+"")
+                                                        .set(new BitClient((highestCode+1)+"", name, lastName, product, quantity))
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if(task.isSuccessful()){
+                                                                    Log.d("ShoppingFragment", "onComplete: sent successfully");
+                                                                }
+                                                                else{
+                                                                    Log.w("ShoppingFragment", "onCompleteFailure: " + task.getException().toString());
+                                                                }
+                                                            }
+                                                        });
+                                                highestCode++;
+                                            }
+                                            Toast.makeText(thisContext, "עסקה בוצעה בהצלחה", Toast.LENGTH_SHORT).show();
+                                            alert.dismiss();
+                                            deliveryArrayList.clear();
+                                            adapter.notifyDataSetChanged();
+
+                                        }
+                                    }
+                                }
+                            });
+                }
+            });
         }
 
 
@@ -476,5 +585,12 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
             }
         }
         return -1;
+    }
+
+    //checks if the intent is available
+    private boolean isIntentAvailable(Context context, Intent intent) {
+        final PackageManager packageManager = context.getPackageManager();
+        List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        return list.size() > 0;
     }
 }

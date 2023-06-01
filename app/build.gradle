@@ -52,6 +52,6 @@ dependencies {
 
     implementation 'com.airbnb.android:lottie:3.7.0'
 
-    implementation 'nl.dionsegijn:konfetti-xml:2.0.2'
+    implementation 'nl.dionsegijn:konfetti-xml:2.0.0@aar'
     implementation 'nl.dionsegijn:konfetti-core:2.0.2'
 }

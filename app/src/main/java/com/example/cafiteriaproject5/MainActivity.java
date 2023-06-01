@@ -1,5 +1,6 @@
 package com.example.cafiteriaproject5;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private StorageReference storageRef;
     private Button btnRegDialog, btnLogDialog;
     String grade, firstName, lastName, regPassword, regGmail, logGmail, logPassword, type = "client";
+
+    ProgressDialog progressDialog;
 
 
     @Override
@@ -147,6 +150,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     regGmail = etGmailReg.getText().toString();
                     regPassword = etRegPassword.getText().toString();
 
+                    //מסך טעינה להעלאת קובץ ושינוי הפרטים
+                    progressDialog = new ProgressDialog(MainActivity.this);
+                    progressDialog.show();
+
                     //check if the user filled all the fields.
                     if(firstName.isEmpty() || lastName.isEmpty() || regPassword.isEmpty() || regGmail.isEmpty() || grade.isEmpty()){
                         Toast.makeText(dialogView.getContext(), "אנא מלא את כל השדות", Toast.LENGTH_SHORT).show();
@@ -170,6 +177,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                         @Override
                                                         public void onComplete(@NonNull Task<Void> task) {
                                                             if(task.isSuccessful()){
+                                                                if(progressDialog.isShowing())
+                                                                    progressDialog.dismiss();
                                                                 Toast.makeText(dialogView.getContext(), "נרשמת בהצלחה", Toast.LENGTH_SHORT).show();
                                                                 //intent automatically to clientMain because when signin up the user is automatically a client, unless changed in the firestore by hand.
                                                                 Intent i = new Intent(MainActivity.this, ClientMainActivity.class);
@@ -181,6 +190,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                             }
                                                         }
                                                     });
+                                        }
+                                        else{
+                                            Toast.makeText(MainActivity.this, task.getException().toString(), Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 });
@@ -243,6 +255,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     logGmail = etGmailLog.getText().toString();
                     logPassword = etPasslog.getText().toString();
 
+                    //מסך טעינה להעלאת קובץ ושינוי הפרטים
+                    progressDialog = new ProgressDialog(MainActivity.this);
+                    progressDialog.show();
+
                     if(logGmail.equals("") || logPassword.equals("")){
                         Toast.makeText(dialogView.getContext(), "אנא מלא את כל השדות", Toast.LENGTH_SHORT).show();
                     }
@@ -255,8 +271,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             //check if the user is a client or an admin
                                             Intent iClient = new Intent(MainActivity.this, ClientMainActivity.class);
                                             Intent iAdmin = new Intent(MainActivity.this, ShministMainActivity.class);
-                                            iClient.putExtra("doc", logGmail.toString());
-                                            iAdmin.putExtra("doc", logGmail.toString());
+                                            iClient.putExtra("doc", logGmail);
+                                            iAdmin.putExtra("doc", logGmail);
                                             DocumentReference docRef = firestore.collection("users").document(logGmail);
                                             docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                 @Override
@@ -264,6 +280,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                     if (task.isSuccessful()) {
                                                         DocumentSnapshot document = task.getResult();
                                                         if (document.exists()) {
+                                                            if(progressDialog.isShowing())
+                                                                progressDialog.dismiss();
                                                             Toast.makeText(dialogView.getContext(), "התחברת בהצלחה", Toast.LENGTH_SHORT).show();
                                                             String typeLog = document.getString("type");
                                                             if(typeLog.equals("client")){

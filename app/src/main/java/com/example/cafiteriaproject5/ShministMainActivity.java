@@ -78,6 +78,10 @@ public class ShministMainActivity extends AppCompatActivity{
                         replaceFragment(new EditShministFragment());
                         break;
 
+                    case R.id.nav_computer:
+                        replaceFragment(new BitClientsFragment());
+                        break;
+
                     case R.id.nav_emoji_people:
                         replaceFragment(new SeeWantedFragment());
                         break;

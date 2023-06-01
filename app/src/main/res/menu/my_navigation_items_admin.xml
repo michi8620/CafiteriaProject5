@@ -13,6 +13,11 @@
             android:iconTint="@color/darkRed"
             android:title="עריכת דף הבית של הלקוח" />
         <item
+            android:id="@+id/nav_computer"
+            android:icon="@drawable/ic_baseline_computer_24"
+            android:iconTint="@color/darkRed"
+            android:title="תשלומים בביט" />
+        <item
             android:id="@+id/nav_emoji_people"
             android:icon="@drawable/ic_baseline_emoji_people_24"
             android:iconTint="@color/darkRed"
