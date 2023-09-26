@@ -57,17 +57,26 @@ public class ProfileShministFragment extends Fragment implements View.OnClickLis
     private String mParam1;
     private String mParam2;
 
-    private String firstName, lastName, email, money;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String money;
 
-    private Button btnEditProfileShministDialog, btnChangeIGDialog;
+    //buttons
+    private Button btnEditProfileShministDialog;
+    private Button btnChangeIGDialog;
+
     private CircleImageView ivNewProfileImage;
+    private CircleImageView ivProfileImageShminist;
+
     private TextView tvNameShministProfile;
     private TextView tvLastNameShministProfile;
     private TextView tvGmailShministProfile;
     private TextView tvMoneyShministProfile;
-    private String gmail = "";
-    private CircleImageView ivProfileImageShminist;
 
+    private String gmail = "";
+
+    //flags that indicate that the profile info has been updated
     public boolean flagImage;
     private Boolean flagFirstName;
     private Boolean flagLastName;
@@ -75,11 +84,15 @@ public class ProfileShministFragment extends Fragment implements View.OnClickLis
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private FirebaseFirestore firestore;
+
     private Context context;
+
     private Uri imageUri;
     private StorageReference storageRef;
-    ProgressDialog progressDialog;
+
     private StorageReference profileImageRef;
+
+    ProgressDialog progressDialog;
 
     public ProfileShministFragment() {
         // Required empty public constructor
@@ -119,14 +132,17 @@ public class ProfileShministFragment extends Fragment implements View.OnClickLis
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_profile_shminist, container, false);
         context = view.getContext();
+
         tvNameShministProfile = view.findViewById(R.id.tvNameShministProfile);
         tvLastNameShministProfile = view.findViewById(R.id.tvLastNameShministProfile);
         tvGmailShministProfile = view.findViewById(R.id.tvGmailShministProfile);
         tvMoneyShministProfile = view.findViewById(R.id.tvMoneyShministProfile);
+
         btnEditProfileShministDialog = view.findViewById(R.id.btnEditProfileShministDialog);
         btnEditProfileShministDialog.setOnClickListener(this);
         btnChangeIGDialog = view.findViewById(R.id.btnChangeIGDialog);
         btnChangeIGDialog.setOnClickListener(this);
+
         ivProfileImageShminist = view.findViewById(R.id.ivProfileImageShminist);
 
         //get the email from the FirebaseAuth
@@ -135,7 +151,9 @@ public class ProfileShministFragment extends Fragment implements View.OnClickLis
             gmail = user.getEmail();
         }
 
+        //get the string texts of the profile info
         updateStringFields();
+        //get the profile image from storage
         updateImage(ivProfileImageShminist);
 
         return view;
@@ -157,12 +175,15 @@ public class ProfileShministFragment extends Fragment implements View.OnClickLis
 
             Button btnChangeProfileImage = dialogView.findViewById(R.id.btnChangeProfileImage);
             Button btnUpdateProfile = dialogView.findViewById(R.id.btnUpdateProfile);
+
             ivNewProfileImage = dialogView.findViewById(R.id.ivNewProfileImage);
+
             EditText etNewName = dialogView.findViewById(R.id.etNewName);
             EditText etNewLastName = dialogView.findViewById(R.id.etNewLastName);
 
             etNewName.setText(firstName);
             etNewLastName.setText(lastName);
+
             updateImage(ivNewProfileImage);
 
             //select image
@@ -202,6 +223,7 @@ public class ProfileShministFragment extends Fragment implements View.OnClickLis
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                         updateImage(ivNewProfileImage);
                                         flagImage = true;
+                                        //checking it here becuase it's the last function that runs.
                                         if(flagFirstName && flagLastName){
                                             if(progressDialog.isShowing())
                                                 progressDialog.dismiss();
@@ -223,6 +245,7 @@ public class ProfileShministFragment extends Fragment implements View.OnClickLis
 
                     String newFirstName = etNewName.getText().toString();
                     String newLastName = etNewLastName.getText().toString();
+
                     DocumentReference userRef = firestore.collection("users").document(gmail);
 
                     //update everything else
@@ -275,6 +298,7 @@ public class ProfileShministFragment extends Fragment implements View.OnClickLis
                 }
             });
         }
+        //update the instagram link
         if(btnChangeIGDialog == v){
             //הבונה של הדיאלוג
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -297,7 +321,6 @@ public class ProfileShministFragment extends Fragment implements View.OnClickLis
                         //check if it's a proper url
                         URL url = new URL(IGlink);
 
-                        Log.d("ProfileShminist", "onClick: IGlink2: " + IGlink);
                         firestore.collection("IGlink").document("link").update("linkText", IGlink)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
@@ -326,8 +349,18 @@ public class ProfileShministFragment extends Fragment implements View.OnClickLis
 
         if(requestCode == 100 && data != null && data.getData() != null){
 
-            imageUri = data.getData();
-            ivNewProfileImage.setImageURI(imageUri);
+            Uri selectedUri = data.getData();
+
+            // Check the file type using the MIME type
+            String mimeType = getActivity().getContentResolver().getType(selectedUri);
+            if (mimeType != null && mimeType.startsWith("image/")) {
+                // The selected file is an image
+                imageUri = selectedUri;
+                ivNewProfileImage.setImageURI(imageUri);
+            } else {
+                // The selected file is not an image
+                Toast.makeText(getContext(), "אנא בחר בקובץ מסוג תמונה", Toast.LENGTH_SHORT).show();
+            }
 
         }
     }

@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:text="מחיר"
+            android:text="מוצר"
             android:textColor="@color/darkRed"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -50,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:text="מוצר"
+            android:text="מחיר"
             android:textColor="@color/darkRed"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -102,6 +102,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
+            android:gravity="center"
             android:text="@string/fragment_home_title"
             android:textColor="@color/darkRed"
             android:textSize="34sp"
@@ -126,14 +127,14 @@
             android:id="@+id/tvTitleClient"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="52dp"
+            android:layout_marginTop="30dp"
             android:textColor="@color/darkRed"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView8" />
+            app:layout_constraintTop_toBottomOf="@+id/btnStopMusic" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewProductClient"
@@ -145,10 +146,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView14" />
 
-        <nl.dionsegijn.konfetti.xml.KonfettiView
-            android:id="@+id/konfettiView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        <Button
+            android:id="@+id/btnStopMusic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="42dp"
+            android:backgroundTint="@color/lightRed"
+            android:text="עצור מוזיקה"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

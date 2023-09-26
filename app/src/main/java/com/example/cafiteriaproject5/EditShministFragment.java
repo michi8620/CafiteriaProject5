@@ -59,11 +59,17 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
 
     private String mParam1;
     private String mParam2;
-    private String TAG = "EditAdminFragment";
 
     private FirebaseFirestore firestore;
-    private Button btnAddEventDialog, btnAddProductDialog, btnChangePriceDialog;
-    private TextView tvTitle, tvText;
+
+    private Button btnAddEventDialog;
+    private Button btnAddProductDialog;
+    private Button btnChangePriceDialog;
+
+    private TextView tvTitle;
+    private TextView tvText;
+
+    //start from 99 because I do ++ from the start
     private static int productCode = 99;
 
     private RecyclerView productRecyclerView;
@@ -95,6 +101,7 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
     @Override
     public void onStart() {
         super.onStart();
+        //get the event from firestore
         DocumentReference docRef = firestore.collection("events").document("event");
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -128,16 +135,16 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        assert container != null;
-        thiscontext = container.getContext();
-
         View view= inflater.inflate(R.layout.fragment_edit_shminist, container, false);
+        thiscontext = view.getContext();
+
         tvText = view.findViewById(R.id.tvText);
         tvTitle = view.findViewById(R.id.tvTitle);
+
         btnAddEventDialog = view.findViewById(R.id.btnAddEventDialog);
         btnAddProductDialog = view.findViewById(R.id.btnAddProductDialog);
         btnChangePriceDialog = view.findViewById(R.id.btnChangePriceDialog);
+
         btnAddEventDialog.setOnClickListener(this);
         btnAddProductDialog.setOnClickListener(this);
         btnChangePriceDialog.setOnClickListener(this);
@@ -160,6 +167,7 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
 
         productRecyclerView.setAdapter(adapter);
 
+        //delete a product
         adapter.setOnItemClickListener(new ProductAdapter.OnItemClickListener() {
             @Override
             public void OnItemClick(int position) {
@@ -232,6 +240,7 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
+        //update the event
         if(view == btnAddEventDialog){
             //הבונה של הדיאלוג
             AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
@@ -244,6 +253,7 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
             alert.show();
 
             Button btnAddEvent = dialogView.findViewById(R.id.btnAddEvent);
+
             EditText etTitle = dialogView.findViewById(R.id.etTitle);
             EditText etText = dialogView.findViewById(R.id.etText);
 
@@ -279,6 +289,7 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
             });
 
         }
+        //add a product
         if (view == btnAddProductDialog) {
             //הבונה של הדיאלוג
             AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
@@ -291,6 +302,7 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
             alert.show();
 
             Button btnAddProduct = dialogView.findViewById(R.id.btnAddProduct);
+
             EditText etProductName = dialogView.findViewById(R.id.etProductName);
             EditText etPrice = dialogView.findViewById(R.id.etPrice);
 
@@ -299,15 +311,22 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
                 public void onClick(View view) {
                     String productName = etProductName.getText().toString();
                     Double price = Double.parseDouble(etPrice.getText().toString());
+                    //assume the highestCode is 99
                     int highestCode = 99;
+                    //check what is the highest code so it
+                    //won't repeat itself
                     for(Product product : productArrayList){
                         if(product.getCode() > highestCode) {
                             highestCode = product.getCode();
                         }
                     }
                     productCode = highestCode+1;
+
                     Product product = new Product(productName, price, productCode);
+
                     String code = Integer.toString(productCode);
+
+                    //add the product to firestore
                     firestore.collection("products")
                             .document(code)
                             .set(product)
@@ -319,13 +338,14 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
                                         alert.dismiss();
                                     }
                                     else{
-                                        Log.w(TAG, "onCompleteFailure: " + task.getException().toString());
+                                        Log.w("EditShministFragment", "onCompleteFailure: " + task.getException().toString());
                                     }
                                 }
                             });
                 }
             });
         }
+        //change the price of a product based on its code
         if(view == btnChangePriceDialog){
             //הבונה של הדיאלוג
             AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
@@ -342,16 +362,22 @@ public class EditShministFragment extends Fragment implements View.OnClickListen
 
             etProductCodePriceChange = dialogView.findViewById(R.id.etProductCodePriceChange);
             etNewPrice = dialogView.findViewById(R.id.etNewPrice);
+
             btnChangePrice = dialogView.findViewById(R.id.btnChangePrice);
+
+            //change the price
             btnChangePrice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     String productCodePriceChange = etProductCodePriceChange.getText().toString();
                     double newPrice = Double.parseDouble(etNewPrice.getText().toString());
+
+                    //check if the price is higher than 0
                     if(newPrice <= 0){
                         Toast.makeText(thiscontext, "מחיר לא תקין", Toast.LENGTH_SHORT).show();
                     }
                     else{
+                        //update the price
                         firestore.collection("products").document(productCodePriceChange)
                                 .update("price", newPrice).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override

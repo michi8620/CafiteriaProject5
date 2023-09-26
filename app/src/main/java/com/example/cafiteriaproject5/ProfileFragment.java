@@ -62,20 +62,31 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
 
     private String mParam1;
     private String mParam2;
-    private String selectedGrade, grade, firstName, lastName, email, money;
+
+    private String selectedGrade;
+    private String grade;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String money;
 
     private Button btnEditProfileDialog;
+
+    private CircleImageView ivProfileImage;
     private CircleImageView ivNewProfileImage;
+
     private TextView tvNameProfile;
     private TextView tvLastNameProfile;
     private TextView tvGmailProfile;
     private TextView tvGradeProfile;
     private TextView tvMoneyProfile;
+
     private String gmail = "";
-    private CircleImageView ivProfileImage;
+
+
     private ImageView ivIGicon;
 
-    public boolean flagImage;
+    private boolean flagImage;
     private Boolean flagFirstName;
     private Boolean flagLastName;
     private Boolean flagGrade = false;
@@ -83,7 +94,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private FirebaseFirestore firestore;
+
     private Context context;
+
     private Uri imageUri;
     private StorageReference storageRef;
     ProgressDialog progressDialog;
@@ -129,29 +142,39 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         context = view.getContext();
+
         tvNameProfile = view.findViewById(R.id.tvNameProfile);
         tvLastNameProfile = view.findViewById(R.id.tvLastNameProfile);
         tvGmailProfile = view.findViewById(R.id.tvGmailProfile);
         tvGradeProfile = view.findViewById(R.id.tvGradeProfile);
         tvMoneyProfile = view.findViewById(R.id.tvMoneyProfile);
+
         btnEditProfileDialog = view.findViewById(R.id.btnEditProfileDialog);
         btnEditProfileDialog.setOnClickListener(this);
+
         ivProfileImage = view.findViewById(R.id.ivProfileImage);
         ivIGicon = view.findViewById(R.id.ivIGicon);
+
+        //when the user clicks the instagram icon he is sent to instagram
         ivIGicon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //get the link from firestore, that the shminist/admin set
                 firestore.collection("IGlink").document("link").get()
                         .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 if (task.isSuccessful()){
                                     String IGlink = task.getResult().getString("linkText");
+                                    //"try and catch" beacuse I want to check if
+                                    //the link is a real link
                                     try {
                                         URL url = new URL(IGlink);
                                         Uri webpage = Uri.parse(IGlink);
                                         Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
                                         intent.setPackage("com.instagram,android");
+                                        //check if there is instagram app or google to
+                                        //send the user to
                                         if (isIntentAvailable(context, intent)){
                                             startActivity(intent);
                                         } else{
@@ -172,7 +195,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
             gmail = user.getEmail();
         }
 
+        //get the string texts of the profile
         updateStringFields();
+        //get the profile image from firebase storage
         updateImage(ivProfileImage);
 
         return view;
@@ -187,6 +212,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
 
     @Override
     public void onClick(View v) {
+        //update the profile info
         if(v==btnEditProfileDialog){
             //הבונה של הדיאלוג
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -201,19 +227,24 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
 
             Button btnChangeProfileImage = dialogView.findViewById(R.id.btnChangeProfileImage);
             Button btnUpdateProfile = dialogView.findViewById(R.id.btnUpdateProfile);
+
             ivNewProfileImage = dialogView.findViewById(R.id.ivNewProfileImage);
+
             EditText etNewName = dialogView.findViewById(R.id.etNewName);
             EditText etNewLastName = dialogView.findViewById(R.id.etNewLastName);
 
+            //set the info from firestore
             etNewName.setText(firstName);
             etNewLastName.setText(lastName);
             updateImage(ivNewProfileImage);
 
+            //for changing grade
             Spinner spinner = dialogView.findViewById(R.id.spinner1);
 
             //You can use this adapter to provide views for an AdapterView.
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context, R.array.grade, android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
             //creating spinner for the grade field.
             spinner.setAdapter(adapter);
             spinner.setOnItemSelectedListener(this);
@@ -230,7 +261,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
             });
 
 
-            //update profile
+            //update profile info
             btnUpdateProfile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -255,8 +286,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
                                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                             updateImage(ivNewProfileImage);
                                             flagImage = true;
-                                            Log.d("ProfileFragment", "onSuccess: " + flagFirstName + flagLastName + flagGrade);
-                                            if(flagImage && flagFirstName && flagLastName & flagGrade){
+                                            //checking it here becuase it's the last function that runs.
+                                            if(flagFirstName && flagLastName & flagGrade){
                                                 if(progressDialog.isShowing())
                                                     progressDialog.dismiss();
                                                 alert.dismiss();
@@ -272,6 +303,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
                                     });
                     }
                     else{
+                        //in case he doesn't want to change the image
                         flagImage = true;
                     }
 
@@ -324,7 +356,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
                         flagLastName = true;
                     }
 
+                    //update the profile picture in the fragment
                     updateImage(ivProfileImage);
+                    //update the string texts in the fragment
                     updateStringFields();
                 }
             });
@@ -352,6 +386,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+        //in case the user doesn't want to change his grade
         flagGrade = true;
         selectedGrade = grade;
     }
@@ -362,8 +397,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
 
         if(requestCode == 100 && data != null && data.getData() != null){
 
-            imageUri = data.getData();
-            ivNewProfileImage.setImageURI(imageUri);
+            Uri selectedUri = data.getData();
+
+            // Check the file type using the MIME type
+            String mimeType = getActivity().getContentResolver().getType(selectedUri);
+            if (mimeType != null && mimeType.startsWith("image/")) {
+                // The selected file is an image
+                imageUri = selectedUri;
+                ivNewProfileImage.setImageURI(imageUri);
+            } else {
+                // The selected file is not an image
+                Toast.makeText(getContext(), "אנא בחר בקובץ מסוג תמונה", Toast.LENGTH_SHORT).show();
+            }
 
         }
     }

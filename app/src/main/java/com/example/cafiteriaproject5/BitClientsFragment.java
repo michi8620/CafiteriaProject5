@@ -1,6 +1,8 @@
 package com.example.cafiteriaproject5;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,10 +45,12 @@ public class BitClientsFragment extends Fragment implements EventListener<QueryS
     private String mParam1;
     private String mParam2;
 
+    private Context context;
+
     private FirebaseFirestore firestore;
+
     private RecyclerView bitClientsRecyclerView;
     private BitClientAdapter bitClientAdapter;
-
     private ArrayList<BitClient> bitArrayList = new ArrayList<>();
 
     public BitClientsFragment() {
@@ -86,28 +90,49 @@ public class BitClientsFragment extends Fragment implements EventListener<QueryS
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_bit_clients, container, false);
+        context = view.getContext();
+
         bitClientsRecyclerView = view.findViewById(R.id.bitClientsRecyclerView);
+
+        //for the view holder
         bitClientsRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+
         bitClientAdapter = new BitClientAdapter(container.getContext(), bitArrayList);
         bitClientsRecyclerView.setAdapter(bitClientAdapter);
+
+        //delete the bit client
         bitClientAdapter.setOnItemClickListener(new BitClientAdapter.OnItemClickListener() {
             @Override
             public void OnItemClick(int position) {
                 //delete from firebase
-                firestore.collection("bit")
-                        .document(bitArrayList.get(position).getCode() + "")
-                        .delete()
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                                Log.d("SeeWanted", "item deleted successfully");
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("SeeWanted", "onFailure: item still in firebase, ", e);
-                            }
-                        });
+                androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context);
+                adb.setTitle("האם את/ה בטוח/ה שאת/ה רוצה למחוק את המוצר?");
+                adb.setPositiveButton("כן", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        firestore.collection("bit")
+                                .document(bitArrayList.get(position).getCode() + "")
+                                .delete()
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.d("SeeWanted", "item deleted successfully");
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w("SeeWanted", "onFailure: item still in firebase, ", e);
+                                    }
+                                });
+                    }
+                });
+                adb.setNegativeButton("לא", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adb.create().dismiss();
+                    }
+                });
+                adb.create().show();
             }
         });
 

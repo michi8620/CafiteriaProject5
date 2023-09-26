@@ -36,11 +36,15 @@ public class AdminOnlyFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private Button btnSelectImage, btnUploadImage;
+    private Button btnSelectImage;
+    private Button btnUploadImage;
+
     private ImageView imageSchedule;
     Uri imageUri;
-    Context thiscontext;
     StorageReference storageRef;
+
+    Context thiscontext;
+
     ProgressDialog progressDialog;
 
 
@@ -84,8 +88,10 @@ public class AdminOnlyFragment extends Fragment {
         btnSelectImage = view.findViewById(R.id.btnSelectImage);
         btnUploadImage = view.findViewById(R.id.btnUploadImage);
         imageSchedule = view.findViewById(R.id.imageSchedule);
+
         thiscontext = container.getContext();
 
+        //select the image from gallery using intent
         btnSelectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -93,6 +99,7 @@ public class AdminOnlyFragment extends Fragment {
             }
         });
 
+        //upload image to firebase storage
         btnUploadImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -117,19 +124,6 @@ public class AdminOnlyFragment extends Fragment {
 
         storageRef = FirebaseStorage.getInstance().getReference();
         StorageReference scheduleRef = storageRef.child("images/schedule.jpg");
-        // Delete the file that already exists to prevent loss of storage
-        //there's always a picture already existing.
-        scheduleRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Toast.makeText(thiscontext, "file deleted successfully", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                Toast.makeText(thiscontext, exception.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
 
         //upload image
         scheduleRef.putFile(imageUri)
@@ -166,8 +160,18 @@ public class AdminOnlyFragment extends Fragment {
 
         if(requestCode == 100 && data != null && data.getData() != null){
 
-            imageUri = data.getData();
-            imageSchedule.setImageURI(imageUri);
+            Uri selectedUri = data.getData();
+
+            // Check the file type using the MIME type
+            String mimeType = getActivity().getContentResolver().getType(selectedUri);
+            if (mimeType != null && mimeType.startsWith("image/")) {
+                // The selected file is an image
+                imageUri = selectedUri;
+                imageSchedule.setImageURI(imageUri);
+            } else {
+                // The selected file is not an image
+                Toast.makeText(getContext(), "אנא בחר בקובץ מסוג תמונה", Toast.LENGTH_SHORT).show();
+            }
 
         }
     }

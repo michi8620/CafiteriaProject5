@@ -2,19 +2,19 @@ package com.example.cafiteriaproject5;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,21 +34,13 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import nl.dionsegijn.konfetti.core.PartyFactory;
-import nl.dionsegijn.konfetti.core.emitter.Emitter;
-import nl.dionsegijn.konfetti.core.emitter.EmitterConfig;
-import nl.dionsegijn.konfetti.core.models.Shape;
-import nl.dionsegijn.konfetti.core.models.Size;
-import nl.dionsegijn.konfetti.xml.KonfettiView;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements EventListener<QuerySnapshot>, ShakeDetector.OnShakeListener {
+public class HomeFragment extends Fragment implements EventListener<QuerySnapshot>, ShakeDetector.OnShakeListener, View.OnClickListener {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -63,10 +55,15 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private String gmail = "";
+    //get the current money to add to it the 10 shekels
     private Double currentMoney=0.0;
+    //did the user get the gift.
     private boolean gift;
 
-    private TextView tvTitleClient, tvTextClient;
+    private Button btnStopMusic;
+
+    private TextView tvTitleClient;
+    private TextView tvTextClient;
 
     private RecyclerView productRecyclerViewClient;
     private ProductAdapter adapter;
@@ -74,9 +71,6 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
     private ArrayList<Product> productArrayListClient = new ArrayList<Product>();
 
     private ShakeDetector shakeDetector;
-    private KonfettiView konfettiView;
-    private Shape.DrawableShape drawableShape;
-    private EmitterConfig emitterConfig;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -99,6 +93,7 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
         return fragment;
     }
 
+    //get the event on start of the fragment
     @Override
     public void onStart() {
         super.onStart();
@@ -139,13 +134,16 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         thiscontext = container.getContext();
+
         tvTextClient = view.findViewById(R.id.tvTextClient);
         tvTitleClient = view.findViewById(R.id.tvTitleClient);
 
+        btnStopMusic = view.findViewById(R.id.btnStopMusic);
+        btnStopMusic.setOnClickListener(this);
+
         shakeDetector = new ShakeDetector(thiscontext);
         shakeDetector.setOnShakeListener(this);
-        konfettiView = view.findViewById(R.id.konfettiView);
-        drawableShape = new Shape.DrawableShape(AppCompatResources.getDrawable(thiscontext, R.drawable.ic_baseline_android), true);
+        shakeDetector.setOnShakeListener(this);
 
         productRecyclerViewClient = view.findViewById(R.id.recyclerViewProductClient);
         productRecyclerViewClient.setLayoutManager(new LinearLayoutManager(view.getContext()));
@@ -163,41 +161,8 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
 
         adapter = new ProductAdapter(thiscontext, productArrayListClient, inflater, this);
 
+        //set the adapter
         productRecyclerViewClient.setAdapter(adapter);
-
-        adapter.setOnItemClickListener(new ProductAdapter.OnItemClickListener() {
-            @Override
-            public void OnItemClick(int position) {
-                androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(thiscontext);
-                adb.setTitle("האם את/ה בטוח/ה שאת/ה רוצה למחוק את המוצר " + productArrayListClient.get(position).getName() + "?");
-                adb.setPositiveButton("כן", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String productCode = productArrayListClient.get(position).getCode() + "";
-                        firestore.collection("products").document(productCode)
-                                .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Toast.makeText(thiscontext, "נמחק בהצלחה", Toast.LENGTH_SHORT).show();
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.w("EditAdminFragment", "onFailure: Error deleting document", e);
-                                    }
-                                });
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-                adb.setNegativeButton("לא", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        adb.create().dismiss();
-                    }
-                });
-                adb.create().show();
-            }
-        });
 
         //listener for the firestore, to see updates in the list
         firestore
@@ -236,6 +201,7 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
         return view;
     }
 
+
     @Override
     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
         //\כאן אנחנו יכולים לראות אם יש שינוי כלשהו ברשימה
@@ -255,33 +221,23 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
         adapter.notifyDataSetChanged();
     }
 
+    //when the user shakes the phone
     @Override
     public void onResume() {
         super.onResume();
         shakeDetector.start();
     }
 
+    //when the user stops shaking the phone
     @Override
     public void onPause() {
         super.onPause();
         shakeDetector.stop();
     }
 
+    //when the shake occurs
     @Override
     public void onShake() {
-        // The konfetti doesn't work anymore and idk why
-        emitterConfig = new Emitter(300, TimeUnit.MILLISECONDS).max(300);
-        Log.d("HomeFragment", "onShake: konfetti");
-        konfettiView.start(
-                new PartyFactory(emitterConfig)
-                        .shapes(Shape.Circle.INSTANCE, Shape.Square.INSTANCE, drawableShape)
-                        .spread(360)
-                        .position(0.5, 0.25, 1, 1)
-                        .sizes(new Size(8,50,10))
-                        .timeToLive(3000)
-                        .fadeOutEnabled(true)
-                        .build()
-        );
         //get the email from the FirebaseAuth
         user = mAuth.getCurrentUser();
         if(user != null){
@@ -326,5 +282,14 @@ public class HomeFragment extends Fragment implements EventListener<QuerySnapsho
                         }
                     }
                 });
+    }
+
+    //stop the background music
+    @Override
+    public void onClick(View v) {
+        if(v==btnStopMusic){
+            requireActivity().stopService(new Intent(thiscontext, MusicService.class));
+            Toast.makeText(thiscontext, "עצר מוזיקה בהצלחה", Toast.LENGTH_SHORT).show();
+        }
     }
 }

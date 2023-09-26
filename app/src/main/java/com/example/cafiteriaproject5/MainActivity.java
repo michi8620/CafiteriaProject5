@@ -45,7 +45,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseAuth mAuth;
     private StorageReference storageRef;
     private Button btnRegDialog, btnLogDialog;
-    String grade, firstName, lastName, regPassword, regGmail, logGmail, logPassword, type = "client";
+    String grade;
+    String firstName;
+    String lastName;
+    String regPassword;
+    String regGmail;
+    String logGmail;
+    String logPassword;
+    String type = "client";
 
     ProgressDialog progressDialog;
 

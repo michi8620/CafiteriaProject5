@@ -1,6 +1,8 @@
 package com.example.cafiteriaproject5;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,10 +47,12 @@ public class SeeWantedFragment extends Fragment implements EventListener<QuerySn
     private String mParam2;
     private String itemId = "";
 
+    private Context context;
+
     private FirebaseFirestore firestore;
+
     private RecyclerView wantedRecyclerView;
     private WantedAdapter wantedAdapter;
-
     private ArrayList<WantedProduct> wantedProductArrayList = new ArrayList<WantedProduct>();
 
     public SeeWantedFragment() {
@@ -80,29 +84,50 @@ public class SeeWantedFragment extends Fragment implements EventListener<QuerySn
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_see_wanted, container, false);
+        context = view.getContext();
 
         wantedRecyclerView = view.findViewById(R.id.wantedRecyclerView);
+
+        //for the view holder
         wantedRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+
         wantedAdapter = new WantedAdapter(container.getContext(), wantedProductArrayList);
         wantedRecyclerView.setAdapter(wantedAdapter);
+
+        //delete the wantedProduct
         wantedAdapter.setOnItemClickListener(new WantedAdapter.OnItemClickListener() {
             @Override
             public void OnItemClick(int position) {
                 //delete from firebase
-                firestore.collection("wantedProducts")
-                        .document(wantedProductArrayList.get(position).getCode() + "")
-                        .delete()
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context);
+                adb.setTitle("האם את/ה בטוח/ה שאת/ה רוצה למחוק את המוצר " + wantedProductArrayList.get(position).getName() + "?");
+                adb.setPositiveButton("כן", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onSuccess(Void unused) {
-                        Log.d("SeeWanted", "item deleted successfully");
+                    public void onClick(DialogInterface dialog, int which) {
+                        //delete from firestore
+                        firestore.collection("wantedProducts")
+                                .document(wantedProductArrayList.get(position).getCode() + "")
+                                .delete()
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.d("SeeWanted", "item deleted successfully");
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w("SeeWanted", "onFailure: item still in firebase, ", e);
+                                    }
+                                });
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("SeeWanted", "onFailure: item still in firebase, ", e);
-                            }
-                        });
+                });
+                adb.setNegativeButton("לא", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adb.create().dismiss();
+                    }
+                });
+                adb.create().show();
             }
         });
 
@@ -110,6 +135,7 @@ public class SeeWantedFragment extends Fragment implements EventListener<QuerySn
         firestore
                 .collection("wantedProducts")
                 .addSnapshotListener(this);
+
         //מועתק מonEvent בגלל שהפונקציה הזו פועלת רק לאחר עדכון ולא על ההתחלה
         firestore.collection("wantedProducts")
                 .get()

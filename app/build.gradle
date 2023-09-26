@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.cafiteriaproject5"
-        minSdk 31
+        minSdk 28
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -51,7 +51,4 @@ dependencies {
     implementation 'com.google.android.material:material:<version>'
 
     implementation 'com.airbnb.android:lottie:3.7.0'
-
-    implementation 'nl.dionsegijn:konfetti-xml:2.0.0@aar'
-    implementation 'nl.dionsegijn:konfetti-core:2.0.2'
 }

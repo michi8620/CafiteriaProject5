@@ -18,7 +18,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -39,9 +38,9 @@ public class WantedProductsFragment extends Fragment implements View.OnClickList
     private EditText etWantedProduct;
     private Button btnSendWanted;
 
+    //for the wantedProducts collection.
+    //can't repeat the same document name.
     private int highestCode = 0;
-
-    private ArrayList<WantedProduct> wantedProductArrayList = new ArrayList<WantedProduct>();
 
     public WantedProductsFragment() {
         // Required empty public constructor

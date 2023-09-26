@@ -28,8 +28,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -62,24 +60,43 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
     private String mParam2;
 
     Context thisContext;
+
     private FirebaseFirestore firestore;
+
     private TextView tvSum;
-    private Button btnDeliveryDialog, btnSendDelivery, btnBitDialog;
-    private EditText etCodeDelivery, etQuantityDelivery;
-    private RecyclerView deliveryRecyclerView;
-    private ProductDeliveryAdapter adapter;
-    private String fullName = "", grade = "", message = "", roomNum = "", comment = "";
-    private String name="", lastName="", indexStr="";
+
+    private Button btnDeliveryDialog;
+    private Button btnSendDelivery;
+    private Button btnBitDialog;
+
+    private EditText etCodeDelivery;
+    private EditText etQuantityDelivery;
+
+    private String fullName = "";
+    private String grade = "";
+    private String message = "";
+    private String roomNum = "";
+    private String comment = "";
+    private String name="";
+    private String lastName="";
+
     private double sum=0;
+
     private static int index=0;
+
     private int roomNumInt;
+
+    //for the bitClient collection
     private int highestCode = 0;
 
+    //for the delivery view
     private ArrayList<ProductDelivery> deliveryArrayList = new ArrayList<>();
+    private RecyclerView deliveryRecyclerView;
+    private ProductDeliveryAdapter adapter;
 
+    //for the products in the dialog view
     private RecyclerView productDialogRecyclerView;
     private ProductAdapter adapterDialog;
-
     private ArrayList<Product> productDialogArrayList = new ArrayList<>();
 
     public ShoppingFragment() {
@@ -154,6 +171,37 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
         btnSendDelivery.setOnClickListener(this);
         btnBitDialog.setOnClickListener(this);
 
+        //delete the item from the delivery view
+        adapter.setOnItemClickListener(new ProductDeliveryAdapter.OnItemClickListener() {
+            @Override
+            public void OnItemClick(int position) {
+                androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(thisContext);
+                adb.setTitle("האם את/ה בטוח/ה שאת/ה רוצה למחוק את המוצר " + deliveryArrayList.get(position).getName() + " מהרשימה?");
+                adb.setPositiveButton("כן", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(position < deliveryArrayList.size()){
+                            sum-=deliveryArrayList.get(position).getTotal();
+                            tvSum.setText(sum + "");
+                            deleteDelivery(deliveryArrayList, position);
+                            index--;
+                            adapter.notifyDataSetChanged();
+                        }
+                        else{
+                            Toast.makeText(thisContext, "מספר לא קיים", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                adb.setNegativeButton("לא", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adb.create().dismiss();
+                    }
+                });
+                adb.create().show();
+            }
+        });
+
         return view;
     }
 
@@ -173,74 +221,12 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
             etCodeDelivery = dialogView.findViewById(R.id.etCodeDelivery);
             etQuantityDelivery = dialogView.findViewById(R.id.etQuantityDelivery);
             Button btnAddDelivery = dialogView.findViewById(R.id.btnAddDelivery);
+
             productDialogRecyclerView = dialogView.findViewById(R.id.productDialogRecyclerView);
             adapterDialog = new ProductAdapter(thisContext, productDialogArrayList, getLayoutInflater(), this);
             productDialogRecyclerView.setAdapter(adapterDialog);
             productDialogRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
-            adapterDialog.setOnItemClickListener(new ProductAdapter.OnItemClickListener() {
-                @Override
-                public void OnItemClick(int position) {
-                    androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(thisContext);
-                    adb.setTitle("האם את/ה בטוח/ה שאת/ה רוצה למחוק את המוצר " + productDialogArrayList.get(position).getName() + "?");
-                    adb.setPositiveButton("כן", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            String productCode = productDialogArrayList.get(position).getCode() + "";
-                            firestore.collection("products").document(productCode)
-                                    .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void unused) {
-                                            Toast.makeText(thisContext, "נמחק בהצלחה", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.w("EditAdminFragment", "onFailure: Error deleting document", e);
-                                        }
-                                    });
-                            adapter.notifyDataSetChanged();
-                        }
-                    });
-                    adb.setNegativeButton("לא", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            adb.create().dismiss();
-                        }
-                    });
-                    adb.create().show();
-                }
-            });
-
-            adapter.setOnItemClickListener(new ProductDeliveryAdapter.OnItemClickListener() {
-                @Override
-                public void OnItemClick(int position) {
-                    androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(thisContext);
-                    adb.setTitle("האם את/ה בטוח/ה שאת/ה רוצה למחוק את המוצר " + deliveryArrayList.get(position).getName() + " מהרשימה?");
-                    adb.setPositiveButton("כן", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if(position < deliveryArrayList.size()){
-                                sum-=deliveryArrayList.get(position).getTotal();
-                                tvSum.setText(sum + "");
-                                deleteDelivery(deliveryArrayList, position);
-                                index--;
-                                adapter.notifyDataSetChanged();
-                            }
-                            else{
-                                Toast.makeText(thisContext, "מספר לא קיים", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-                    adb.setNegativeButton("לא", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            adb.create().dismiss();
-                        }
-                    });
-                    adb.create().show();
-                }
-            });
 
             //בחלק זה אנו בונים את הרשימה שבתוך הדיאלוג על מנת שהמשתמש יראה את הקודים של המוצרים
             //listener for the firestore, to see updates in the list
@@ -346,6 +332,7 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
                 }
             });
         }
+        //send the delivery in email
         if (view == btnSendDelivery) {
             //check if there's products in the delivery
             if(deliveryArrayList.isEmpty()){
@@ -423,6 +410,9 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
                                                     try{
                                                         startActivity(intent);
                                                         alert.dismiss();
+                                                        //I can't check if the user sent his email,
+                                                        //so I created a delay, assuming that the user
+                                                        //will send the delivery after 10 seconds.
                                                         Handler handler = new Handler();
                                                         handler.postDelayed(new Runnable() {
                                                             @Override
@@ -460,77 +450,84 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
 
         }
         if(view == btnBitDialog){
-            //הבונה של הדיאלוג
-            AlertDialog.Builder builder = new AlertDialog.Builder(thisContext);
-            // יצירת הוויאו של הדיאלוג על ידי קריאת קובץ האקסמל
-            View dialogView = getLayoutInflater().inflate(R.layout.dialog_bitpay, null, false);
-            //Sets a custom view to be the contents of the alert dialog.
-            builder.setView(dialogView);
-            //Creates an AlertDialog with the arguments supplied to this builder.
-            AlertDialog alert = builder.create();
-            alert.show();
+            if(deliveryArrayList.isEmpty()){
+                Toast.makeText(thisContext, "נא הוסף מוצרים למשלוח", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                //הבונה של הדיאלוג
+                AlertDialog.Builder builder = new AlertDialog.Builder(thisContext);
+                // יצירת הוויאו של הדיאלוג על ידי קריאת קובץ האקסמל
+                View dialogView = getLayoutInflater().inflate(R.layout.dialog_bitpay, null, false);
+                //Sets a custom view to be the contents of the alert dialog.
+                builder.setView(dialogView);
+                //Creates an AlertDialog with the arguments supplied to this builder.
+                AlertDialog alert = builder.create();
+                alert.show();
 
-            Button btnBitLink = alert.findViewById(R.id.btnBitLink);
-            Button btnSendInfo = alert.findViewById(R.id.btnSendInfo);
-            btnBitLink.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Uri webpage = Uri.parse("https://www.bitpay.co.il/app/TapToPay");
-                    Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
-                    intent.setPackage("com.bitpay.wallet");
-                    if (isIntentAvailable(thisContext, intent)){
-                        startActivity(intent);
-                    } else{
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.bitpay.co.il/app/TapToPay")));
+                Button btnBitLink = alert.findViewById(R.id.btnBitLink);
+                Button btnSendInfo = alert.findViewById(R.id.btnSendInfo);
+
+                //sending to the "bit" application using intent
+                btnBitLink.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Uri webpage = Uri.parse("https://www.bitpay.co.il/app/TapToPay");
+                        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+                        intent.setPackage("com.bitpay.wallet");
+                        if (isIntentAvailable(thisContext, intent)){
+                            startActivity(intent);
+                        } else{
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.bitpay.co.il/app/TapToPay")));
+                        }
                     }
-                }
-            });
-            btnSendInfo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    String email = user.getEmail();
-                    firestore.collection("users").document(email+"")
-                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    if(task.isSuccessful()){
-                                        DocumentSnapshot documentSnapshot = task.getResult();
-                                        if(documentSnapshot.exists()){
-                                            name = documentSnapshot.getString("firstName");
-                                            lastName = documentSnapshot.getString("lastName");
-                                            for (int i=0; i<deliveryArrayList.size(); i++){
-                                                String product, quantity;
-                                                product = deliveryArrayList.get(i).getName();
-                                                quantity = deliveryArrayList.get(i).getQuantity()+"";
-                                                indexStr = deliveryArrayList.get(i).getIndex()+"";
-                                                Log.d("ShoppingFragment", "onComplete: " + highestCode);
-                                                firestore.collection("bit").document((highestCode+1)+"")
-                                                        .set(new BitClient((highestCode+1)+"", name, lastName, product, quantity))
-                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
-                                                                if(task.isSuccessful()){
-                                                                    Log.d("ShoppingFragment", "onComplete: sent successfully");
+                });
+                //send the delivery list to the shminist side
+                btnSendInfo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        String email = user.getEmail();
+                        firestore.collection("users").document(email+"")
+                                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if(task.isSuccessful()){
+                                            DocumentSnapshot documentSnapshot = task.getResult();
+                                            if(documentSnapshot.exists()){
+                                                name = documentSnapshot.getString("firstName");
+                                                lastName = documentSnapshot.getString("lastName");
+                                                for (int i=0; i<deliveryArrayList.size(); i++){
+                                                    String product, quantity;
+                                                    product = deliveryArrayList.get(i).getName();
+                                                    quantity = deliveryArrayList.get(i).getQuantity()+"";
+                                                    Log.d("ShoppingFragment", "onComplete: " + highestCode);
+                                                    firestore.collection("bit").document((highestCode+1)+"")
+                                                            .set(new BitClient((highestCode+1)+"", name, lastName, product, quantity))
+                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                    if(task.isSuccessful()){
+                                                                        Log.d("ShoppingFragment", "onComplete: sent successfully");
+                                                                    }
+                                                                    else{
+                                                                        Log.w("ShoppingFragment", "onCompleteFailure: " + task.getException().toString());
+                                                                    }
                                                                 }
-                                                                else{
-                                                                    Log.w("ShoppingFragment", "onCompleteFailure: " + task.getException().toString());
-                                                                }
-                                                            }
-                                                        });
-                                                highestCode++;
-                                            }
-                                            Toast.makeText(thisContext, "עסקה בוצעה בהצלחה", Toast.LENGTH_SHORT).show();
-                                            alert.dismiss();
-                                            deliveryArrayList.clear();
-                                            adapter.notifyDataSetChanged();
+                                                            });
+                                                    highestCode++;
+                                                }
+                                                Toast.makeText(thisContext, "עסקה בוצעה בהצלחה", Toast.LENGTH_SHORT).show();
+                                                alert.dismiss();
+                                                deliveryArrayList.clear();
+                                                adapter.notifyDataSetChanged();
 
+                                            }
                                         }
                                     }
-                                }
-                            });
-                }
-            });
+                                });
+                    }
+                });
+            }
         }
 
 
@@ -587,7 +584,7 @@ public class ShoppingFragment extends Fragment implements View.OnClickListener, 
         return -1;
     }
 
-    //checks if the intent is available
+    //checks if the intent is available in the phone
     private boolean isIntentAvailable(Context context, Intent intent) {
         final PackageManager packageManager = context.getPackageManager();
         List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);

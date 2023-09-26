@@ -22,12 +22,15 @@ public class SplashScreen extends AppCompatActivity {
         appName = findViewById(R.id.appName);
         lottie = findViewById(R.id.lottie);
 
+        //יצירת אנימציה
         appName.animate().translationY(450).setDuration(2700).setStartDelay(0);
         lottie.animate().translationX(2000).setDuration(2000).setStartDelay(2900);
 
+        //האנימציה נמשכת 5 שניות
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                //אינטנט לmainActivity
                 Intent i = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(i);
             }

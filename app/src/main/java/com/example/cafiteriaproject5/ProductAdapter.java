@@ -43,6 +43,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductViewHolder>{
         Context context = parent.getContext();
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         View v;
+        //I don't want the trash icon to show in the product list og the client
+        //so I check which fragment it is.
         if(fragment instanceof HomeFragment || fragment instanceof ShoppingFragment){
             v = inflater.inflate(R.layout.product_client_row, parent, false);
         } else if(fragment instanceof EditShministFragment){

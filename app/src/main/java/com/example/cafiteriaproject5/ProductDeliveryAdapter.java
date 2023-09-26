@@ -52,22 +52,4 @@ public class ProductDeliveryAdapter extends RecyclerView.Adapter<ProductDelivery
         return deliveryList.size();
     }
 
-    /*@SuppressLint("SetTextI18n")
-    @NonNull
-    @Override
-    public View getView(int position, @NonNull View convertView, @NonNull ViewGroup parent){
-        @SuppressLint("ViewHolder") View view = LayoutInflater.from(context).inflate(R.layout.product_shopping_row, null, false);
-        ProductDelivery productDelivery = deliveryArrayList.get(position);
-        view.setLayoutDirection(getContext().getResources().getConfiguration().getLayoutDirection());
-
-        TextView tvProductName = view.findViewById(R.id.tvProductNameShopping);
-        TextView tvProductQuantity = view.findViewById(R.id.tvProductQuantityShopping);
-        TextView tvProductTotal = view.findViewById(R.id.tvProductTotal);
-
-        tvProductName.setText(productDelivery.getName() + "");
-        tvProductQuantity.setText(productDelivery.getQuantity() + "");
-        tvProductTotal.setText(productDelivery.getTotal() + "₪");
-
-        return view;
-    }*/
 }

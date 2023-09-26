@@ -3,6 +3,7 @@ package com.example.cafiteriaproject5;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -29,7 +30,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -61,15 +61,19 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
     private String mParam2;
 
     private Context thiscontext;
+
     private ImageView ivSchedule;
     private StorageReference storageReference;
-    private Button btnMinusDialog, btnPlusDialog;
+
+    private Button btnMinusDialog;
+    private Button btnPlusDialog;
+    private Button btnStopMusicShminist;
+
     private FirebaseFirestore firestore;
-    private FirebaseAuth firebaseAuth;
     private StorageReference storageRef;
+
     private UserAdapter adapter;
     private RecyclerView userRecyclerView;
-
     private ArrayList<User> userArrayList = new ArrayList<User>();
 
     public HomeShministFragment() {
@@ -102,7 +106,6 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
         }
 
         firestore = FirebaseFirestore.getInstance();
-        firebaseAuth = FirebaseAuth.getInstance();
         storageRef = FirebaseStorage.getInstance().getReference();
 
     }
@@ -114,17 +117,23 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_shminist, container, false);
         thiscontext = container.getContext();
+
         ivSchedule = view.findViewById(R.id.ivSchedule);
+
         btnPlusDialog = view.findViewById(R.id.btnPlusDialog);
         btnMinusDialog = view.findViewById(R.id.btnMinusDialog);
+        btnStopMusicShminist = view.findViewById(R.id.btnStopMusicShminist);
         btnPlusDialog.setOnClickListener(this);
         btnMinusDialog.setOnClickListener(this);
+        btnStopMusicShminist.setOnClickListener(this);
+
         userRecyclerView = view.findViewById(R.id.userRecyclerView);
         userRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         adapter = new UserAdapter(thiscontext, userArrayList);
 
         userRecyclerView.setAdapter(adapter);
 
+        //delete the user with the trash icon
         adapter.setOnItemClickListener(new UserAdapter.OnItemClickListener() {
             @Override
             public void OnItemClick(int position) {
@@ -148,9 +157,7 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
                                         Log.w("HomeShminist", "onFailure: item still in firebase, ", e);
                                     }
                                 });
-                        //delete from auth: can't, gotta ask what to do about it.
                         //delete the profile
-
                         // Create a reference to the file to delete
                         StorageReference profileRef = storageRef.child("profiles/" + userArrayList.get(position).getGmail());
 
@@ -180,6 +187,7 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
             }
         });
 
+        //get the schedule image from firebase storage
         storageReference = FirebaseStorage.getInstance().getReference("images/schedule.jpg");
         try {
             //creating a temporary local file in which we will be storing the image
@@ -294,6 +302,7 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
 
     @Override
     public void onClick(View view) {
+        //add money to a user
         if(view == btnPlusDialog){
             //הבונה של הדיאלוג
             AlertDialog.Builder builder = new AlertDialog.Builder(thiscontext);
@@ -363,6 +372,7 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
             });
 
         }
+        //decrease money from the user
         if(view == btnMinusDialog){
             //הבונה של הדיאלוג
             AlertDialog.Builder builder = new AlertDialog.Builder(thiscontext);
@@ -427,6 +437,11 @@ public class HomeShministFragment extends Fragment implements EventListener<Quer
                     }
                 }
             });
+        }
+        //stop the background music
+        if(view == btnStopMusicShminist){
+            requireActivity().stopService(new Intent(thiscontext, MusicService.class));
+            Toast.makeText(thiscontext, "עצר מוזיקה בהצלחה", Toast.LENGTH_SHORT).show();
         }
     }
 }
